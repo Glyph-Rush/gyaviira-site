@@ -9,6 +9,7 @@ import hoodie1 from '../assets/hoodie_1.png';
 import hoodie2 from '../assets/hoodie_2.png';
 import shirt1 from '../assets/shirt_1.png';
 import shirt2 from '../assets/shirt_2.png';
+import downloadMenu from '../assets/download_menu.png';
 
 type Category = 'All' | 'Outerwear' | 'Head' | 'Shirts';
 
@@ -104,6 +105,17 @@ const Store: React.FC = () => {
                         ))}
                     </AnimatePresence>
                 </motion.div>
+
+                {/* Download Section */}
+                <div className="flex justify-center mt-20">
+                    <a
+                        href={downloadMenu}
+                        download="Gyaviira_Official_Flyer.png"
+                        className="btn px-10 py-4 flex items-center gap-3 shadow-[0_0_30px_rgba(212,175,55,0.4)] hover:shadow-[0_0_50px_rgba(212,175,55,0.6)] animate-pulse"
+                    >
+                        <span className="font-impact text-xl tracking-widest text-black">DOWNLOAD FLYER</span>
+                    </a>
+                </div>
             </div>
         </div>
     );

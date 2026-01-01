@@ -17,7 +17,7 @@ const Home: React.FC = () => {
                 >
                     <h2 className="text-3xl md:text-5xl font-heading text-gold-primary mb-8">The Legacy</h2>
                     <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-                        The Gyaviira Music Foundation is dedicated to preserving and promoting the rich musical heritage of our community.
+                        The <span className="font-cursive text-gold-primary text-2xl">Gyaviira</span> Music Foundation is dedicated to preserving and promoting the rich musical heritage of our community.
                         Through excellence in composition, performance, and education, we build a bridge between tradition and future greatness.
                         Our mission extends to reaching the world with the Gospel, using our God-given talent of music to inspire faith, hope, and love in every heart we touch.
                     </p>
