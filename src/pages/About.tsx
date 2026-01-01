@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { User } from 'lucide-react';
 
 const About: React.FC = () => {
     return (
@@ -18,7 +19,7 @@ const About: React.FC = () => {
                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-gold-dark via-gold-primary to-gold-dark"></div>
                         <div className="absolute -top-20 -right-20 w-64 h-64 bg-gold-primary/5 rounded-full blur-3xl group-hover:bg-gold-primary/10 transition-all duration-1000"></div>
 
-                        <div className="space-y-8 text-gray-300 font-light leading-relaxed text-lg font-body">
+                        <div className="space-y-8 text-gray-300 font-light leading-relaxed text-lg font-body relative z-10">
                             <p>
                                 <span className="text-gold-primary font-heading text-2xl font-bold block mb-4 text-center">The <span className="font-cursive text-4xl">Gyaviira</span> Music Foundation</span>
                                 was created to honor the timeless power of music as both heritage and future. Rooted in faith, legacy, and creativity, we exist to preserve cultural traditions while inspiring new generations of artists to find their voice.
@@ -48,6 +49,39 @@ const About: React.FC = () => {
                                 <p className="font-impact text-2xl md:text-3xl text-gold-light text-center uppercase tracking-wider">
                                     The <span className="font-cursive text-gold-primary capitalize">Gyaviira</span> Music Foundation stands as a beacon of inspiration, carrying forward the legacy of music as heritage while boldly shaping its future. Together, we sing not only for ourselves, but for the world—for unity, for joy, and for the eternal rhythm of hope.
                                 </p>
+                            </div>
+
+                            {/* Leadership Frames */}
+                            <div className="pt-16 grid grid-cols-1 md:grid-cols-2 gap-10 justify-items-center">
+                                {/* Founder Frame */}
+                                <div className="flex flex-col items-center group/frame">
+                                    <div className="w-64 h-80 bg-[#111] border-2 border-gold-primary/30 rounded-lg relative flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.1)] group-hover/frame:border-gold-primary group-hover/frame:shadow-[0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
+                                        <div className="absolute inset-2 border border-gold-primary/20 rounded-sm"></div>
+                                        <User size={64} className="text-gray-600 group-hover/frame:text-gold-primary transition-colors duration-500" />
+
+                                        {/* Corner Decorations */}
+                                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-gold-primary/50"></div>
+                                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-gold-primary/50"></div>
+                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-gold-primary/50"></div>
+                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-gold-primary/50"></div>
+                                    </div>
+                                    <h3 className="mt-6 text-2xl font-heading text-gold-primary font-bold tracking-widest uppercase">Founder & CEO</h3>
+                                </div>
+
+                                {/* Co-Founder Frame */}
+                                <div className="flex flex-col items-center group/frame">
+                                    <div className="w-64 h-80 bg-[#111] border-2 border-gold-primary/30 rounded-lg relative flex items-center justify-center overflow-hidden shadow-[0_0_20px_rgba(212,175,55,0.1)] group-hover/frame:border-gold-primary group-hover/frame:shadow-[0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
+                                        <div className="absolute inset-2 border border-gold-primary/20 rounded-sm"></div>
+                                        <User size={64} className="text-gray-600 group-hover/frame:text-gold-primary transition-colors duration-500" />
+
+                                        {/* Corner Decorations */}
+                                        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-gold-primary/50"></div>
+                                        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-gold-primary/50"></div>
+                                        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-gold-primary/50"></div>
+                                        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-gold-primary/50"></div>
+                                    </div>
+                                    <h3 className="mt-6 text-2xl font-heading text-gold-primary font-bold tracking-widest uppercase">Co-Founder & Manager</h3>
+                                </div>
                             </div>
                         </div>
                     </div>
