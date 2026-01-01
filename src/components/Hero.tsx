@@ -35,7 +35,7 @@ const Hero: React.FC = () => {
                     className="text-5xl md:text-7xl lg:text-9xl font-heading font-black text-white mb-6 tracking-wider shadow-gold"
                     style={{ textShadow: '0 0 20px rgba(212, 175, 55, 0.3)' }}
                 >
-                    GYAVIIRA
+                    <span className="font-cursive text-gold-primary">Gyaviira</span>
                 </motion.h1>
 
                 <motion.p
