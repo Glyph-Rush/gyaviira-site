@@ -3,10 +3,10 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 
 import Store from './pages/Store';
+import Contact from './pages/Contact';
 
 // Placeholder pages
 const About = () => <div className="pt-32 text-center text-white text-2xl font-heading">About Page Coming Soon</div>;
-const Contact = () => <div className="pt-32 text-center text-white text-2xl font-heading">Contact Page Coming Soon</div>;
 
 function App() {
   return (
