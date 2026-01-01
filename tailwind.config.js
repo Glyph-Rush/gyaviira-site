@@ -16,6 +16,7 @@ export default {
             fontFamily: {
                 heading: ['Cinzel', 'serif'],
                 body: ['Montserrat', 'sans-serif'],
+                cursive: ['Great Vibes', 'cursive'],
             },
         },
     },
