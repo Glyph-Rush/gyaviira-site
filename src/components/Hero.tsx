@@ -57,7 +57,7 @@ const Hero: React.FC = () => {
                         Check The Store
                         <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                     </Link>
-                    <Link to="/about" className="btn-outline px-8 py-3 rounded-sm font-heading uppercase tracking-widest text-sm font-bold border-gold-primary text-gold-primary hover:bg-gold-primary hover:text-black transition-all">
+                    <Link to="/about" className="btn-outline px-8 py-3 font-heading uppercase tracking-widest text-sm font-bold border-gold-primary text-gold-primary hover:bg-gold-primary hover:text-black transition-all">
                         Our Mission
                     </Link>
                 </motion.div>
