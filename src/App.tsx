@@ -4,6 +4,9 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Store from './pages/Store';
 import Contact from './pages/Contact';
+import Gallery from './pages/Gallery';
+import Newsletter from './pages/Newsletter';
+import Instruments from './pages/Instruments';
 import RhythmChat from './components/RhythmChat';
 
 function App() {
@@ -16,6 +19,9 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/store" element={<Store />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/gallery" element={<Gallery />} />
+          <Route path="/newsletter" element={<Newsletter />} />
+          <Route path="/instruments" element={<Instruments />} />
         </Routes>
         <RhythmChat />
         <footer className="bg-black-soft py-10 text-center border-t border-gray-900 mt-20">
