@@ -1,6 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 :root {
   --color-gold-primary: #D4AF37;
@@ -17,14 +17,29 @@
 }
 
 @keyframes mesh-drift {
-  0% { background-position: 0% 0%; }
-  50% { background-position: 100% 100%; }
-  100% { background-position: 0% 0%; }
+  0% {
+    background-position: 0% 0%;
+  }
+
+  50% {
+    background-position: 100% 100%;
+  }
+
+  100% {
+    background-position: 0% 0%;
+  }
 }
 
 @keyframes neon-pulse {
-  0%, 100% { text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.2); }
-  50% { text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4); }
+
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5), 0 0 20px rgba(212, 175, 55, 0.2);
+  }
+
+  50% {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.4);
+  }
 }
 
 * {
@@ -39,7 +54,7 @@ body {
   font-family: var(--font-body);
   overflow-x: hidden;
   line-height: 1.6;
-  background-image: 
+  background-image:
     radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
     radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.03) 0%, transparent 40%),
     linear-gradient(rgba(212, 175, 55, 0.01) 1px, transparent 1px),
@@ -111,12 +126,28 @@ img {
   font-family: var(--font-heading);
   font-weight: 700;
   border: none;
-  border-radius: 4px;
+  border-radius: 1.25rem;
   cursor: pointer;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  letter-spacing: 2px;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold-primary), var(--color-gold-light));
+  background-size: 200% auto;
+  color: var(--color-black);
+  border: none;
+  font-weight: 800;
+  border-radius: 1.25rem;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.btn-gold:hover {
+  background-position: right center;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+  transform: translateY(-2px);
 }
 
 .btn:hover {
@@ -129,6 +160,7 @@ img {
   background: transparent;
   border: 1px solid var(--color-gold-primary);
   color: var(--color-gold-primary);
+  border-radius: 1.25rem;
   position: relative;
   overflow: hidden;
   z-index: 1;
@@ -177,7 +209,10 @@ img {
 .cyber-border::after {
   content: '';
   position: absolute;
-  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  top: -1px;
+  left: -1px;
+  right: -1px;
+  bottom: -1px;
   background: linear-gradient(90deg, transparent, var(--color-gold-primary), transparent);
   background-size: 200% 100%;
   animation: scan-line 4s linear infinite;
@@ -187,8 +222,13 @@ img {
 }
 
 @keyframes scan-line {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .font-impact {
