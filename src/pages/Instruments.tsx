@@ -1,6 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ShoppingCart, Star } from 'lucide-react';
+import str_1 from '../assets/str_1.png';
+import per_1 from '../assets/per_1.png';
+import per_2 from '../assets/per_2.png';
+import wnd_1 from '../assets/wnd_1.png';
 
 const instruments = [
     {
@@ -9,7 +13,7 @@ const instruments = [
         price: '$450.00',
         category: 'String',
         rating: 5,
-        image: 'https://images.unsplash.com/photo-1516057747705-0609711c1b3f?q=80&w=1974'
+        image: str_1
     },
     {
         id: 2,
@@ -17,7 +21,7 @@ const instruments = [
         price: '$180.00',
         category: 'Percussion',
         rating: 4.8,
-        image: 'https://images.unsplash.com/photo-1544644181-1484b3fdfc62?q=80&w=2070'
+        image: per_1
     },
     {
         id: 3,
@@ -25,7 +29,7 @@ const instruments = [
         price: '$75.00',
         category: 'Wind',
         rating: 4.5,
-        image: 'https://images.unsplash.com/photo-1573510317513-390494df056b?q=80&w=2070'
+        image: wnd_1
     },
     {
         id: 4,
@@ -33,7 +37,7 @@ const instruments = [
         price: '$60.00',
         category: 'Percussion',
         rating: 5,
-        image: 'https://images.unsplash.com/photo-1519643381401-22c77e60520e?q=80&w=2070'
+        image: per_2
     },
 ];
 
@@ -66,7 +70,7 @@ const Instruments: React.FC = () => {
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
                                 <div className="absolute top-4 left-4">
-                                    <span className="bg-gold-primary/90 text-black px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">
+                                    <span className="bg-gold-primary/90 text-black px-4 py-1 rounded-xl text-xs font-bold uppercase tracking-widest">
                                         {item.category}
                                     </span>
                                 </div>

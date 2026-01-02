@@ -14,13 +14,13 @@ import downloadMenu from '../assets/download_menu.png';
 type Category = 'All' | 'Outerwear' | 'Head' | 'Shirts';
 
 const products = [
-    { id: 1, name: 'Signature Gold Cap', price: '$25.00', image: cap1, category: 'Head' },
-    { id: 2, name: 'Classic Black Cap', price: '$25.00', image: cap2, category: 'Head' },
-    { id: 3, name: 'Urban Snapback', price: '$25.00', image: cap3, category: 'Head' },
-    { id: 4, name: 'Foundation Hoodie', price: '$55.00', image: hoodie1, category: 'Outerwear' },
-    { id: 5, name: 'Gold Crest Hoodie', price: '$55.00', image: hoodie2, category: 'Outerwear' },
-    { id: 6, name: 'Event Tee', price: '$30.00', image: shirt1, category: 'Shirts' },
-    { id: 7, name: 'Member Tee', price: '$30.00', image: shirt2, category: 'Shirts' },
+    { id: 1, name: 'Gyaviira Gold Cap', price: '$5,000', image: cap1, category: 'Head' },
+    { id: 2, name: 'F.O.F Gold Cap', price: '$5,000', image: cap2, category: 'Head' },
+    { id: 3, name: 'Gyaviira Mono Cap', price: '$5,000', image: cap3, category: 'Head' },
+    { id: 4, name: 'Gyaviira Mono Hoodie', price: '$25,000', image: hoodie1, category: 'Outerwear' },
+    { id: 5, name: 'Gyaviira Gold Hoodie', price: '$25,000', image: hoodie2, category: 'Outerwear' },
+    { id: 6, name: 'Gyaviira Mono T-Shirt', price: '$15,000', image: shirt1, category: 'Shirts' },
+    { id: 7, name: 'Gyaviira Gold T-Shirt', price: '$15,000', image: shirt2, category: 'Shirts' },
 ];
 
 const Store: React.FC = () => {
@@ -47,7 +47,7 @@ const Store: React.FC = () => {
                             <button
                                 key={category}
                                 onClick={() => setSelectedCategory(category as Category)}
-                                className={`px-6 py-2 rounded-full border border-gold-primary transition-all duration-300 font-heading text-sm uppercase tracking-wider
+                                className={`px-6 py-2 rounded-xl border border-gold-primary transition-all duration-300 font-heading text-sm uppercase tracking-wider
                                     ${selectedCategory === category
                                         ? 'bg-gold-primary text-black shadow-[0_0_15px_rgba(212,175,55,0.5)]'
                                         : 'bg-transparent text-gold-primary hover:bg-gold-primary/10'}`}
@@ -72,7 +72,7 @@ const Store: React.FC = () => {
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 transition={{ duration: 0.3 }}
                                 whileHover={{ y: -10, boxShadow: '0 20px 40px -20px rgba(212,175,55,0.2)' }}
-                                className="bg-black-soft rounded-xl overflow-hidden group border border-gray-900 hover:border-gold-primary transition-all duration-500 relative"
+                                className="bg-black-soft rounded-[2rem] overflow-hidden group border border-gray-900 hover:border-gold-primary transition-all duration-500 relative"
                             >
                                 <div className="aspect-square bg-gradient-to-br from-[#1a1a1a] to-[#0d0d0d] p-8 flex items-center justify-center relative overflow-hidden">
                                     {/* Glow Effect */}
