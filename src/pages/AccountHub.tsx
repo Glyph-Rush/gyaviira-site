@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { User, Camera, LogOut, Settings, Bell, MessageSquare, ExternalLink, Shield, BadgeCheck } from 'lucide-react';
 
 const AccountHub: React.FC = () => {
-    const { user, logout, updateProfilePic, updateUsername } = useAuth();
+    const { user, logout, updateProfilePic, updateUsername, updatePreferences, deleteUser } = useAuth();
     const navigate = useNavigate();
     const [isEditing, setIsEditing] = useState(false);
     const [tempName, setTempName] = useState(user?.username || '');
@@ -111,9 +111,26 @@ const AccountHub: React.FC = () => {
                                 </div>
                                 <div className="flex justify-between items-center text-sm font-mono">
                                     <span className="text-gray-500 uppercase">Transmissions</span>
-                                    <span className="text-white">128 Cycles</span>
+                                    <span className="text-white">{(user.id.length * 12) + (user.username.length * 3)} Cycles</span>
                                 </div>
                             </div>
+                        </div>
+
+                        {/* Danger Zone */}
+                        <div className="glass-card rounded-[2rem] border border-red-500/10 p-6 space-y-4">
+                            <h3 className="text-xs font-mono text-red-500 uppercase tracking-[0.3em] border-b border-red-500/10 pb-4">Danger Protocol</h3>
+                            <p className="text-[9px] font-mono text-gray-500 uppercase italic">Terminate your digital signature permanently from the foundation archives.</p>
+                            <button
+                                onClick={() => {
+                                    if (window.confirm('CRITICAL: This will permanently wipe your signature from the Foundation records. Continue?')) {
+                                        deleteUser(user.id);
+                                        navigate('/');
+                                    }
+                                }}
+                                className="w-full bg-red-500/5 border border-red-500/20 hover:bg-red-500 hover:text-white py-3 rounded-xl transition-all font-bold text-[10px] tracking-widest uppercase"
+                            >
+                                Wipe Signature
+                            </button>
                         </div>
                     </motion.div>
 
@@ -187,18 +204,21 @@ const AccountHub: React.FC = () => {
                                     </h3>
                                     <div className="space-y-4">
                                         {[
-                                            { label: 'New Music Alerts', desc: 'Get notified when new frequencies drop' },
-                                            { label: 'Community Mentions', desc: 'Alerts from the Musician Discord' },
-                                            { label: 'Store Exclusives', desc: 'Early access to limited apparel' }
-                                        ].map((pref, i) => (
-                                            <div key={i} className="flex items-center justify-between p-6 bg-white/5 rounded-[1.5rem] border border-white/5 hover:border-gold-primary/20 transition-all group">
+                                            { id: 'musicAlerts', label: 'New Music Alerts', desc: 'Get notified when new frequencies drop' },
+                                            { id: 'communityMentions', label: 'Community Mentions', desc: 'Alerts from the Musician Discord' },
+                                            { id: 'storeExclusives', label: 'Store Exclusives', desc: 'Early access to limited apparel' }
+                                        ].map((pref) => (
+                                            <div key={pref.id} className="flex items-center justify-between p-6 bg-white/5 rounded-[1.5rem] border border-white/5 hover:border-gold-primary/20 transition-all group">
                                                 <div>
                                                     <h4 className="text-white font-impact tracking-widest text-sm uppercase mb-1">{pref.label}</h4>
                                                     <p className="text-gray-500 text-[10px] font-mono uppercase italic">{pref.desc}</p>
                                                 </div>
-                                                <div className="w-12 h-6 bg-gold-dark/20 rounded-full relative cursor-pointer border border-gold-primary/20">
-                                                    <div className="absolute left-1 top-1 w-4 h-4 bg-gold-primary rounded-full shadow-gold"></div>
-                                                </div>
+                                                <button
+                                                    onClick={() => updatePreferences({ [pref.id]: !((user.preferences as any)?.[pref.id] ?? false) })}
+                                                    className={`w-12 h-6 rounded-full relative transition-all border ${((user.preferences as any)?.[pref.id]) ? 'bg-gold-primary/20 border-gold-primary/40' : 'bg-white/5 border-white/10'}`}
+                                                >
+                                                    <div className={`absolute top-1 w-4 h-4 rounded-full shadow-gold transition-all ${((user.preferences as any)?.[pref.id]) ? 'right-1 bg-gold-primary rotate-0' : 'left-1 bg-gray-600 rotate-180'}`}></div>
+                                                </button>
                                             </div>
                                         ))}
                                     </div>
@@ -207,11 +227,15 @@ const AccountHub: React.FC = () => {
                                 {/* Quick Links */}
                                 <section className="pt-10 border-t border-white/5 grid grid-cols-2 md:grid-cols-3 gap-6">
                                     {[
-                                        { label: 'Foundation Lore', icon: ExternalLink },
-                                        { label: 'Member Discord', icon: MessageSquare },
-                                        { label: 'Help Terminal', icon: Shield }
+                                        { label: 'Foundation Lore', icon: ExternalLink, path: '/about' },
+                                        { label: 'Member Discord', icon: MessageSquare, path: '/chat' },
+                                        { label: 'Help Terminal', icon: Shield, path: '/contact' }
                                     ].map((link, i) => (
-                                        <button key={i} className="flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl border border-white/5 hover:border-gold-primary/30 transition-all group">
+                                        <button
+                                            key={i}
+                                            onClick={() => navigate(link.path)}
+                                            className="flex flex-col items-center justify-center gap-3 p-6 glass-card rounded-2xl border border-white/5 hover:border-gold-primary/30 transition-all group"
+                                        >
                                             <link.icon size={20} className="text-gold-primary/60 group-hover:text-gold-primary transition-colors" />
                                             <span className="text-[9px] font-mono text-gray-500 group-hover:text-white uppercase tracking-widest text-center">{link.label}</span>
                                         </button>

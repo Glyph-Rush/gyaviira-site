@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, RotateCcw, Music, Zap, Brain, Volume2, Mic2, Activity, Sliders, Layout, Hash, X } from 'lucide-react';
-import store_desktop from '../assets/store_desktop.png';
 import store_mobile from '../assets/store_mobile.png';
 
 // --- SOUND ENGINE ---
@@ -256,7 +255,7 @@ const HarmonyMatch: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onB
                     ]}
                 />
             )}
-            <img src={store_desktop} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
+            <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
 
             <div className="z-10 w-full max-w-2xl space-y-6">
                 <div className="flex justify-between items-end border-b border-gold-primary/20 pb-4">
@@ -400,7 +399,7 @@ const LyricRunner: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBa
                     ]}
                 />
             )}
-            <img src={store_desktop} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
+            <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
 
             <div className="z-10 text-center space-y-12">
                 <h2 className="text-4xl font-impact text-gold-primary tracking-tighter uppercase neon-gold">Lyric Runner</h2>
@@ -457,7 +456,8 @@ const FreqHunter: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBac
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-10 h-full relative">
+        <div className="flex flex-col items-center justify-center p-10 h-full relative overflow-hidden">
+            <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
             {showTutorial && (
                 <TutorialDialog
                     title="Freq Hunter"
@@ -522,7 +522,8 @@ const BeatMachine: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBa
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-10 h-full relative">
+        <div className="flex flex-col items-center justify-center p-10 h-full relative overflow-hidden">
+            <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
             {showTutorial && (
                 <TutorialDialog
                     title="Beat Machine"
@@ -611,7 +612,8 @@ const EchoHero: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack,
     };
 
     return (
-        <div className="flex flex-col items-center justify-center p-10 h-full relative">
+        <div className="flex flex-col items-center justify-center p-10 h-full relative overflow-hidden">
+            <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-5 pointer-events-none" />
             {showTutorial && (
                 <TutorialDialog
                     title="Echo Hero"
@@ -727,7 +729,7 @@ const Games: React.FC = () => {
                                     onClick={() => setSelectedGame('harmony')}
                                     className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <img src={store_desktop} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
                                         <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black mb-2 shadow-2xl">

@@ -13,6 +13,7 @@ const AdminPanel: React.FC = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [activeTab, setActiveTab] = useState<'all' | 'waitlist'>('all');
+    const [isSyncing, setIsSyncing] = useState(false);
 
     // Redirect if not admin
     React.useEffect(() => {
@@ -112,6 +113,14 @@ const AdminPanel: React.FC = () => {
         </motion.tr>
     );
 
+    const handleSync = () => {
+        setIsSyncing(true);
+        setTimeout(() => {
+            setIsSyncing(false);
+            alert('Database synchronized with all Foundation nodes.');
+        }, 2000);
+    };
+
     return (
         <div className="pt-32 pb-20 min-h-screen bg-black-main">
             <div className="container mx-auto px-6 max-w-7xl">
@@ -184,8 +193,12 @@ const AdminPanel: React.FC = () => {
                             <Terminal size={20} className="text-gold-primary" /> {activeTab === 'all' ? 'Registered Entities' : 'Waitlist Signatures'}
                         </h2>
                         <div className="flex gap-4">
-                            <button className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-xl border border-white/5 text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all">
-                                <RefreshCcw size={14} /> Sync Database
+                            <button
+                                onClick={handleSync}
+                                disabled={isSyncing}
+                                className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-xl border border-white/5 text-[10px] font-bold text-gray-400 uppercase tracking-widest hover:text-white hover:bg-white/10 transition-all disabled:opacity-50"
+                            >
+                                <RefreshCcw size={14} className={isSyncing ? 'animate-spin' : ''} /> {isSyncing ? 'Syncing...' : 'Sync Database'}
                             </button>
                         </div>
                     </div>

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck } from 'lucide-react';
+import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download } from 'lucide-react';
+import download_menu from '../assets/download_menu.png';
 
 interface ChatMessage {
     id: string;
@@ -16,14 +17,26 @@ interface ChatMessage {
 const CommunityChat: React.FC = () => {
     const { user, allUsers } = useAuth();
     const navigate = useNavigate();
-    const [messages, setMessages] = useState<ChatMessage[]>([
-        { id: '1', user: 'Zephyros_Prime', text: 'Welcome to the harmonic collective. Every beat matters here.', timestamp: '10:42 AM', isAdmin: true },
-        { id: '2', user: 'BeatMaker99', text: 'Has anyone tried the new Djembe samples?', timestamp: '11:05 AM' },
-        { id: '3', user: 'RhythmQueen', text: 'The vibration profile is incredible on this site.', timestamp: '11:12 AM' }
-    ]);
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [activeChannel, setActiveChannel] = useState('general-vibe');
+    const [showFlyer, setShowFlyer] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Initial load and "Cloud" Sync Simulation
+    useEffect(() => {
+        const syncMessages = () => {
+            const allStoredMessages = JSON.parse(localStorage.getItem('gyaviira_cloud_chat') || '{}');
+            const channelMessages = allStoredMessages[activeChannel] || [
+                { id: '1', user: 'Zephyros_Prime', text: `Welcome to the #${activeChannel} harmonic collective.`, timestamp: '10:42 AM', isAdmin: true }
+            ];
+            setMessages(channelMessages);
+        };
+
+        syncMessages();
+        const interval = setInterval(syncMessages, 2000); // Polling for cross-tab "cloud" sync
+        return () => clearInterval(interval);
+    }, [activeChannel]);
 
     useEffect(() => {
         if (!user) navigate('/auth');
@@ -37,17 +50,31 @@ const CommunityChat: React.FC = () => {
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!inputText.trim() || !user) return;
+        const text = inputText.trim();
+        if (!text || !user) return;
+
+        // Command detection
+        if (text === '/flyer') {
+            setShowFlyer(true);
+            setInputText('');
+            return;
+        }
 
         const newMessage: ChatMessage = {
             id: Date.now().toString(),
             user: user.username,
-            text: inputText,
+            text: text,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            profilePic: user.profilePic
+            profilePic: user.profilePic,
+            isAdmin: user.role === 'admin'
         };
 
-        setMessages(prev => [...prev, newMessage]);
+        const allStoredMessages = JSON.parse(localStorage.getItem('gyaviira_cloud_chat') || '{}');
+        const channelMessages = [...(allStoredMessages[activeChannel] || []), newMessage];
+        allStoredMessages[activeChannel] = channelMessages;
+        localStorage.setItem('gyaviira_cloud_chat', JSON.stringify(allStoredMessages));
+
+        setMessages(channelMessages);
         setInputText('');
     };
 
@@ -217,6 +244,53 @@ const CommunityChat: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Flyer Modal */}
+            <AnimatePresence>
+                {showFlyer && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-6 backdrop-blur-xl"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="relative max-w-2xl w-full glass-card border border-gold-primary/30 rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(212,175,55,0.2)]"
+                        >
+                            <button
+                                onClick={() => setShowFlyer(false)}
+                                className="absolute top-6 right-6 z-10 w-12 h-12 rounded-full bg-black/40 border border-white/10 flex items-center justify-center text-white hover:bg-red-500/20 transition-all hover:text-red-500"
+                            >
+                                <X size={24} />
+                            </button>
+
+                            <div className="flex flex-col md:flex-row h-full">
+                                <div className="w-full md:w-1/2 overflow-hidden border-b md:border-b-0 md:border-r border-white/5">
+                                    <img src={download_menu} alt="Flyer" className="w-full h-full object-cover" />
+                                </div>
+                                <div className="p-10 flex flex-col justify-center space-y-6 flex-1">
+                                    <h3 className="text-4xl font-impact text-gold-primary tracking-tighter uppercase neon-gold">Foundation Flyer</h3>
+                                    <p className="text-gray-400 font-light leading-relaxed">Download the latest frequency guide and exclusive community insights. Your link to the harmonic collective begins here.</p>
+                                    <div className="space-y-4">
+                                        <button className="w-full btn-gold py-4 flex items-center justify-center gap-3 font-bold uppercase tracking-widest text-xs">
+                                            <Download size={18} /> Download Signal
+                                        </button>
+                                        <button
+                                            onClick={() => setShowFlyer(false)}
+                                            className="w-full py-4 text-[10px] font-mono text-gray-600 hover:text-white uppercase tracking-widest transition-colors"
+                                        >
+                                            Return to Transmission
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

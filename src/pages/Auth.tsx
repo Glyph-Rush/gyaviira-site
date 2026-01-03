@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Sparkles, Chrome } from 'lucide-react';
+import { Mail, Lock, User, Sparkles, Chrome, RefreshCcw } from 'lucide-react';
 
 const Auth: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -10,6 +10,7 @@ const Auth: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [isSyncing, setIsSyncing] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
 
@@ -24,6 +25,25 @@ const Auth: React.FC = () => {
         } else {
             setError(result.message || 'Authentication failed.');
         }
+    };
+
+    const handleGoogleSync = () => {
+        setIsSyncing(true);
+        setError(null);
+
+        // Simulate network delay
+        setTimeout(() => {
+            const googleEmail = 'google_user@gmail.com';
+            const googleUsername = 'Google_Sync_User';
+            const result = login(googleEmail, googleUsername);
+
+            if (result.success) {
+                navigate('/account');
+            } else {
+                setError(result.message || 'Google Sync failed.');
+                setIsSyncing(false);
+            }
+        }, 1500);
     };
 
     return (
@@ -78,7 +98,7 @@ const Auth: React.FC = () => {
                     )}
 
                     <div className="space-y-2">
-                        <label className="block text-[10px] font-mono text-gold-primary/60 uppercase tracking-widest ml-1">Email Terminal</label>
+                        <label className="block text-[10px] font-mono text-gold-primary/60 uppercase tracking-widest ml-1">{isLogin ? 'Email or Username' : 'Email Terminal'}</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gold-primary/40" size={18} />
                             <input
@@ -119,11 +139,18 @@ const Auth: React.FC = () => {
                     </div>
 
                     <button
-                        onClick={handleSubmit}
-                        className="w-full bg-[#111] border border-white/5 hover:border-gold-primary/30 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group"
+                        onClick={handleGoogleSync}
+                        disabled={isSyncing}
+                        className="w-full bg-[#111] border border-white/5 hover:border-gold-primary/30 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        <Chrome size={20} className="text-gray-400 group-hover:text-gold-primary transition-colors" />
-                        <span className="text-xs font-mono text-gray-400 group-hover:text-white uppercase tracking-widest">Google Sync</span>
+                        {isSyncing ? (
+                            <RefreshCcw size={20} className="text-gold-primary animate-spin" />
+                        ) : (
+                            <Chrome size={20} className="text-gray-400 group-hover:text-gold-primary transition-colors" />
+                        )}
+                        <span className="text-xs font-mono text-gray-400 group-hover:text-white uppercase tracking-widest">
+                            {isSyncing ? 'Synchronizing...' : 'Google Sync'}
+                        </span>
                     </button>
                 </div>
 
