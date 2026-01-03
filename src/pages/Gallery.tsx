@@ -8,6 +8,12 @@ const images = [
     { url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070', title: 'Youth Mentorship' },
     { url: 'https://images.unsplash.com/photo-1520529277867-dbf8c5e0b340?q=80&w=2072', title: 'Artistry in Motion' },
     { url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070', title: 'Faith-Rooted Performance' },
+    { url: 'https://images.unsplash.com/photo-1516280440614-37939bb92583?q=80&w=2070', title: 'Abstract Harmony' },
+    { url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=2069', title: 'Sonic Textures' },
+    { url: 'https://images.unsplash.com/photo-1429962714451-bb934ecbb4ec?q=80&w=2070', title: 'Live Energy' },
+    { url: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=2070', title: 'Collective Pulse' },
+    { url: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070', title: 'Rhythmic Shadows' },
+    { url: 'https://images.unsplash.com/photo-1514525253361-b83f83ef9102?q=80&w=2070', title: 'Gilded Vibrations' },
 ];
 
 const Gallery: React.FC = () => {

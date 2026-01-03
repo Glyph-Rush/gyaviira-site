@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCart } from '../context/CartContext';
+import { ShoppingBag, ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 // Import assets
 import cap1 from '../assets/cap_1.png';
@@ -14,17 +17,19 @@ import downloadMenu from '../assets/download_menu.png';
 type Category = 'All' | 'Outerwear' | 'Head' | 'Shirts';
 
 const products = [
-    { id: 1, name: 'Gyaviira Gold Cap', price: '$5,000', image: cap1, category: 'Head' },
-    { id: 2, name: 'F.O.F Gold Cap', price: '$5,000', image: cap2, category: 'Head' },
-    { id: 3, name: 'Gyaviira Mono Cap', price: '$5,000', image: cap3, category: 'Head' },
-    { id: 4, name: 'Gyaviira Mono Hoodie', price: '$25,000', image: hoodie1, category: 'Outerwear' },
-    { id: 5, name: 'Gyaviira Gold Hoodie', price: '$25,000', image: hoodie2, category: 'Outerwear' },
-    { id: 6, name: 'Gyaviira Mono T-Shirt', price: '$15,000', image: shirt1, category: 'Shirts' },
-    { id: 7, name: 'Gyaviira Gold T-Shirt', price: '$15,000', image: shirt2, category: 'Shirts' },
+    { id: 1, name: 'Gyaviira Gold Cap', price: 5000, image: cap1, category: 'Head' },
+    { id: 2, name: 'F.O.F Gold Cap', price: 5000, image: cap2, category: 'Head' },
+    { id: 3, name: 'Gyaviira Mono Cap', price: 5000, image: cap3, category: 'Head' },
+    { id: 4, name: 'Gyaviira Mono Hoodie', price: 25000, image: hoodie1, category: 'Outerwear' },
+    { id: 5, name: 'Gyaviira Gold Hoodie', price: 25000, image: hoodie2, category: 'Outerwear' },
+    { id: 6, name: 'Gyaviira Mono T-Shirt', price: 15000, image: shirt1, category: 'Shirts' },
+    { id: 7, name: 'Gyaviira Gold T-Shirt', price: 15000, image: shirt2, category: 'Shirts' },
 ];
 
 const Store: React.FC = () => {
     const [selectedCategory, setSelectedCategory] = useState<Category>('All');
+    const { addToCart, itemCount, totalAmount } = useCart();
+    const navigate = useNavigate();
 
     const filteredProducts = selectedCategory === 'All'
         ? products
@@ -85,8 +90,11 @@ const Store: React.FC = () => {
                                     />
 
                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20 backdrop-blur-sm">
-                                        <button className="btn transform scale-90 group-hover:scale-100 transition-transform duration-300">
-                                            Add to Cart
+                                        <button
+                                            onClick={() => addToCart(product)}
+                                            className="btn transform scale-90 group-hover:scale-100 transition-transform duration-300 flex items-center gap-2"
+                                        >
+                                            <ShoppingBag size={18} /> Add to Cart
                                         </button>
                                     </div>
                                 </div>
@@ -95,10 +103,13 @@ const Store: React.FC = () => {
                                     <span className="text-xs font-bold text-gold-dark uppercase tracking-wider block mb-2">{product.category}</span>
                                     <h3 className="text-xl font-heading text-white group-hover:text-gold-primary transition-colors">{product.name}</h3>
                                     <div className="flex justify-between items-center mt-4">
-                                        <p className="text-lg font-bold text-white/90">{product.price}</p>
-                                        <div className="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center text-gold-primary group-hover:bg-gold-primary group-hover:text-black transition-all">
+                                        <p className="text-lg font-bold text-white/90">UGX {product.price.toLocaleString()}</p>
+                                        <button
+                                            onClick={() => addToCart(product)}
+                                            className="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center text-gold-primary group-hover:bg-gold-primary group-hover:text-black transition-all"
+                                        >
                                             +
-                                        </div>
+                                        </button>
                                     </div>
                                 </div>
                             </motion.div>
@@ -116,6 +127,42 @@ const Store: React.FC = () => {
                         <span className="font-impact text-xl tracking-widest text-black">DOWNLOAD FLYER</span>
                     </a>
                 </div>
+
+                {/* Floating Checkout Button */}
+                <AnimatePresence>
+                    {itemCount > 0 && (
+                        <motion.div
+                            initial={{ y: 100, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 100, opacity: 0 }}
+                            className="fixed bottom-10 left-1/2 -translate-x-1/2 z-40 w-full max-w-md px-6"
+                        >
+                            <button
+                                onClick={() => navigate('/checkout')}
+                                className="w-full glass-card bg-gold-primary text-black p-5 rounded-[2rem] shadow-[0_20px_40px_rgba(212,175,55,0.4)] border border-white/20 flex items-center justify-between group hover:scale-105 transition-transform"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className="w-12 h-12 bg-black/10 rounded-xl flex items-center justify-center">
+                                        <ShoppingBag size={24} />
+                                    </div>
+                                    <div className="text-left">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest opacity-60">Payload Detected</p>
+                                        <p className="font-impact text-xl uppercase tracking-wider">{itemCount} Items Ready</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <div className="text-right mr-2">
+                                        <p className="text-[10px] font-mono uppercase tracking-widest opacity-60">Total Valuation</p>
+                                        <p className="font-impact text-xl uppercase tracking-wider">UGX {totalAmount.toLocaleString()}</p>
+                                    </div>
+                                    <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-gold-primary group-hover:translate-x-1 transition-transform">
+                                        <ArrowRight size={20} />
+                                    </div>
+                                </div>
+                            </button>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
         </div>
     );

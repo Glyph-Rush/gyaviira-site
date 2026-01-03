@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, RotateCcw, Music, Zap, Brain, Volume2, Mic2, Activity, Sliders, Layout, Hash } from 'lucide-react';
+import { Play, RotateCcw, Music, Zap, Brain, Volume2, Mic2, Activity, Sliders, Layout, Hash, X } from 'lucide-react';
 import store_desktop from '../assets/store_desktop.png';
 import store_mobile from '../assets/store_mobile.png';
 
@@ -89,7 +89,10 @@ const TutorialDialog: React.FC<{
         </div>
     );
 };
-const RhythmMaster: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const RhythmMaster: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const [score, setScore] = useState(0);
     const [isActive, setIsActive] = useState(false);
@@ -102,7 +105,7 @@ const RhythmMaster: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             const next = s + 0.05;
             if (next > 2) {
                 setIsActive(false);
-                playSound(150, 'sawtooth', 0.3); // Fail sound
+                playLocalSound(150, 'sawtooth', 0.3); // Fail sound
                 return 1;
             }
             return next;
@@ -124,7 +127,7 @@ const RhythmMaster: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         if (scale > 1.6 && scale < 1.9) {
             setScore(s => s + 100);
             setTargetHit(true);
-            playSound(880, 'sine', 0.1); // Success sound
+            playLocalSound(880, 'sine', 0.1); // Success sound
             setTimeout(() => setTargetHit(false), 200);
             setScale(1);
         } else {
@@ -139,7 +142,7 @@ const RhythmMaster: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Rhythm Master"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "Welcome to the Rhythm Core.",
                         "Your goal is to sync with the pulse of Zephyros.",
@@ -180,7 +183,10 @@ const RhythmMaster: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // --- HARMONY MATCH GAME ---
-const HarmonyMatch: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const HarmonyMatch: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const symbols = ['Kora', 'Djembe', 'Flute', 'Note', 'Clef', 'Rhythm', 'Grace', 'Unity'];
     const [cards, setCards] = useState<{ id: number, symbol: string, isFlipped: boolean, isMatched: boolean }[]>([]);
@@ -203,7 +209,7 @@ const HarmonyMatch: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const handleFlip = (id: number) => {
         if (flipped.length === 2 || cards[id].isMatched || cards[id].isFlipped) return;
 
-        playSound(440, 'sine', 0.05);
+        playLocalSound(440, 'sine', 0.05);
         const newCards = [...cards];
         newCards[id].isFlipped = true;
         setCards(newCards);
@@ -221,7 +227,7 @@ const HarmonyMatch: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     matchedCards[second].isMatched = true;
                     setCards(matchedCards);
                     setFlipped([]);
-                    playSound(1200, 'sine', 0.2);
+                    playLocalSound(1200, 'sine', 0.2);
                 }, 500);
             } else {
                 setTimeout(() => {
@@ -241,7 +247,7 @@ const HarmonyMatch: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Harmony Match"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "Synthesize the harmonics of the Foundation.",
                         "Flip the memory cells to discover hidden instruments and symbols.",
@@ -293,13 +299,16 @@ const HarmonyMatch: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     );
 };
 // --- SYNTH PAD GAME ---
-const SynthPad: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const SynthPad: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const tones = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25];
     const [activePad, setActivePad] = useState<number | null>(null);
 
     const playNote = (freq: number, i: number) => {
-        playSound(freq, 'sine', 0.5);
+        playLocalSound(freq, 'sine', 0.5);
         setActivePad(i);
         setTimeout(() => setActivePad(null), 200);
     };
@@ -310,7 +319,7 @@ const SynthPad: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Synth Pad"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "The Melodic Grid is your canvas.",
                         "Click the golden pads to trigger high-fidelity frequencies.",
@@ -352,7 +361,10 @@ const SynthPad: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // --- LYRIC RUNNER GAME ---
-const LyricRunner: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const LyricRunner: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const lyrics = [
         "Rhythm is the key",
@@ -379,7 +391,7 @@ const LyricRunner: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Lyric Runner"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "Initialize the poetic transmission.",
                         "Watch the anthems of the Foundation flow through the system.",
@@ -409,7 +421,7 @@ const LyricRunner: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
                 <div className="space-y-4">
                     <button
-                        onClick={() => { setIsActive(!isActive); playSound(isActive ? 200 : 800); }}
+                        onClick={() => { setIsActive(!isActive); playLocalSound(isActive ? 200 : 800); }}
                         className="btn-gold px-12 py-4 shadow-gold"
                     >
                         {isActive ? 'STOP TRANSMISSION' : 'INITIALIZE'}
@@ -427,17 +439,20 @@ const LyricRunner: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // --- FREQ HUNTER GAME ---
-const FreqHunter: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const FreqHunter: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const [target] = useState(Math.floor(Math.random() * 800) + 100);
     const [current, setCurrent] = useState(400);
     const [found, setFound] = useState(false);
 
     const checkFreq = () => {
-        playSound(current, 'sine', 0.2);
+        playLocalSound(current, 'sine', 0.2);
         if (Math.abs(current - target) < 10) {
             setFound(true);
-            playSound(1200, 'sine', 0.5);
+            playLocalSound(1200, 'sine', 0.5);
         }
     };
 
@@ -447,7 +462,7 @@ const FreqHunter: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Freq Hunter"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "Locate the Sacred resonant frequency.",
                         "Move the slider to scan the auditory spectrum.",
@@ -478,7 +493,10 @@ const FreqHunter: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // --- BEAT MACHINE GAME ---
-const BeatMachine: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const BeatMachine: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
     const [showTutorial, setShowTutorial] = useState(true);
     const [steps, setSteps] = useState(Array(8).fill(false));
     const [currentStep, setCurrentStep] = useState(0);
@@ -489,7 +507,7 @@ const BeatMachine: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         const interval = setInterval(() => {
             setCurrentStep(s => {
                 const next = (s + 1) % 8;
-                if (steps[next]) playSound(200, 'square', 0.05);
+                if (steps[next]) playLocalSound(200, 'square', 0.05);
                 return next;
             });
         }, 200);
@@ -500,7 +518,7 @@ const BeatMachine: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         const newSteps = [...steps];
         newSteps[i] = !newSteps[i];
         setSteps(newSteps);
-        playSound(600, 'sine', 0.02);
+        playLocalSound(600, 'sine', 0.02);
     };
 
     return (
@@ -509,7 +527,7 @@ const BeatMachine: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Beat Machine"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "Assemble the foundation of a new sound.",
                         "Toggle the steps to build a rhythmic loop.",
@@ -541,12 +559,17 @@ const BeatMachine: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 };
 
 // --- ECHO HERO GAME ---
-const EchoHero: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+const EchoHero: React.FC<{ onBack: () => void; isMuted?: boolean }> = ({ onBack, isMuted }) => {
     const [showTutorial, setShowTutorial] = useState(true);
     const [sequence, setSequence] = useState<number[]>([]);
     const [userSequence, setUserSequence] = useState<number[]>([]);
     const [isDisplaying, setIsDisplaying] = useState(false);
+    const [highScore, setHighScore] = useState(0);
     const notes = [261.63, 329.63, 392.00, 523.25];
+
+    const playLocalSound = (freq: number, type: OscillatorType = 'sine', duration: number = 0.1) => {
+        if (!isMuted) playSound(freq, type, duration);
+    };
 
     const nextRound = () => {
         const next = Math.floor(Math.random() * 4);
@@ -560,20 +583,23 @@ const EchoHero: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         setIsDisplaying(true);
         seq.forEach((noteIdx, i) => {
             setTimeout(() => {
-                playSound(notes[noteIdx], 'sine', 0.3);
-                if (i === seq.length - 1) setIsDisplaying(false);
-            }, i * 600);
+                playLocalSound(notes[noteIdx], 'sine', 0.4);
+                if (i === seq.length - 1) {
+                    setTimeout(() => setIsDisplaying(false), 500);
+                }
+            }, i * 700);
         });
     };
 
     const handleNote = (idx: number) => {
-        if (isDisplaying) return;
-        playSound(notes[idx], 'sine', 0.2);
+        if (isDisplaying || sequence.length === 0) return;
+        playLocalSound(notes[idx], 'sine', 0.2);
         const newSeq = [...userSequence, idx];
         setUserSequence(newSeq);
 
         if (idx !== sequence[newSeq.length - 1]) {
-            playSound(100, 'sawtooth', 0.5);
+            playLocalSound(100, 'sawtooth', 0.5);
+            if (sequence.length - 1 > highScore) setHighScore(sequence.length - 1);
             setSequence([]);
             setUserSequence([]);
             return;
@@ -590,7 +616,7 @@ const EchoHero: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <TutorialDialog
                     title="Echo Hero"
                     onExit={onBack}
-                    onStart={() => { setShowTutorial(false); playSound(1000); }}
+                    onStart={() => { setShowTutorial(false); playLocalSound(1000); }}
                     steps={[
                         "The System is transmitting a pattern.",
                         "Watch and listen carefully to the sequence of notes.",
@@ -600,27 +626,37 @@ const EchoHero: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 />
             )}
             <div className="z-10 text-center space-y-12 w-full max-w-md">
-                <h2 className="text-4xl font-impact text-gold-primary tracking-tighter uppercase neon-gold">Echo Hero</h2>
-                <div className="grid grid-cols-2 gap-6">
+                <div>
+                    <h2 className="text-4xl font-impact text-gold-primary tracking-tighter uppercase neon-gold mb-2">Echo Hero</h2>
+                    <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest">High Score: {highScore}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6 p-4">
                     {['C', 'E', 'G', 'C2'].map((note, i) => (
                         <motion.button
                             key={i}
-                            whileTap={{ scale: 0.9 }}
+                            whileTap={{ scale: 0.95 }}
                             onClick={() => handleNote(i)}
-                            className={`h-24 rounded-2xl border-2 flex items-center justify-center font-impact text-2xl transition-all ${isDisplaying ? 'opacity-50' : 'opacity-100'} ${[
-                                'border-gold-primary text-gold-primary',
-                                'border-white text-white',
-                                'border-cyan-500 text-cyan-500',
-                                'border-purple-500 text-purple-500'
-                            ][i]}`}
+                            className={`h-32 rounded-3xl border-2 flex items-center justify-center font-impact text-3xl transition-all shadow-xl ${isDisplaying ? 'cursor-default' : 'cursor-pointer hover:scale-105 active:shadow-gold'} ${[
+                                'border-gold-primary text-gold-primary shadow-gold/20',
+                                'border-white text-white shadow-white/10',
+                                'border-cyan-500 text-cyan-500 shadow-cyan-500/20',
+                                'border-purple-500 text-purple-500 shadow-purple-500/20'
+                            ][i]} ${isDisplaying && sequence[userSequence.length] === i ? 'opacity-100 scale-110 shadow-gold' : 'opacity-60'}`}
                         >
                             {note}
                         </motion.button>
                     ))}
                 </div>
+
                 <div className="flex flex-col gap-4">
-                    <button onClick={nextRound} className="btn-gold px-12 py-4">{sequence.length === 0 ? 'START ECHOES' : `ROUND ${sequence.length}`}</button>
-                    <button onClick={onBack} className="text-xs text-gray-500 uppercase tracking-widest font-mono">Abort Mission</button>
+                    <button
+                        onClick={() => { if (!isDisplaying) nextRound(); }}
+                        className={`btn-gold px-12 py-5 text-sm tracking-widest font-bold ${isDisplaying || sequence.length > 0 ? 'opacity-50 pointer-events-none' : ''}`}
+                    >
+                        {sequence.length === 0 ? 'ESTABLISH LINK' : `ROUND ${sequence.length}`}
+                    </button>
+                    <button onClick={onBack} className="text-[10px] text-gray-500 uppercase tracking-[0.4em] font-mono hover:text-red-500 transition-colors">Abort Mission</button>
                 </div>
             </div>
         </div>
@@ -630,6 +666,7 @@ const EchoHero: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 // --- MAIN PAGE ---
 const Games: React.FC = () => {
     const [selectedGame, setSelectedGame] = useState<'rhythm' | 'harmony' | 'synth' | 'runner' | 'hunter' | 'beat' | 'echo' | null>(null);
+    const [isMuted, setIsMuted] = useState(false);
 
     return (
         <div className="pt-32 pb-20 min-h-screen bg-black-main relative overflow-hidden">
@@ -794,26 +831,43 @@ const Games: React.FC = () => {
                             exit={{ opacity: 0, scale: 0.9 }}
                             className="max-w-4xl mx-auto glass-card h-[700px] rounded-[3rem] border border-gold-primary/10 relative overflow-hidden"
                         >
-                            <div className="absolute top-6 left-6 flex items-center gap-2 z-20">
-                                <Volume2 size={14} className="text-gold-primary animate-pulse" />
-                                <span className="text-[10px] text-gold-primary font-mono tracking-widest uppercase">Audio Transmission Active</span>
+                            <div className="absolute top-6 left-6 flex items-center gap-4 z-20">
+                                <div className="flex items-center gap-2">
+                                    <Volume2 size={14} className={`text-gold-primary ${!isMuted ? 'animate-pulse' : 'opacity-20'}`} />
+                                    <span className="text-[10px] text-gold-primary font-mono tracking-widest uppercase">{isMuted ? 'Audio Transmission Muted' : 'Audio Transmission Active'}</span>
+                                </div>
+                                <button
+                                    onClick={() => setIsMuted(!isMuted)}
+                                    className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-gold-primary/20 transition-all text-white hover:text-gold-primary pointer-events-auto"
+                                >
+                                    {!isMuted ? <Volume2 size={14} /> : <Zap size={14} className="opacity-40" />}
+                                </button>
                             </div>
 
-                            {selectedGame === 'rhythm' ? (
-                                <RhythmMaster onBack={() => setSelectedGame(null)} />
-                            ) : selectedGame === 'harmony' ? (
-                                <HarmonyMatch onBack={() => setSelectedGame(null)} />
-                            ) : selectedGame === 'synth' ? (
-                                <SynthPad onBack={() => setSelectedGame(null)} />
-                            ) : selectedGame === 'runner' ? (
-                                <LyricRunner onBack={() => setSelectedGame(null)} />
-                            ) : selectedGame === 'hunter' ? (
-                                <FreqHunter onBack={() => setSelectedGame(null)} />
-                            ) : selectedGame === 'beat' ? (
-                                <BeatMachine onBack={() => setSelectedGame(null)} />
-                            ) : (
-                                <EchoHero onBack={() => setSelectedGame(null)} />
-                            )}
+                            <button
+                                onClick={() => setSelectedGame(null)}
+                                className="absolute top-6 right-6 z-20 w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-red-500/20 hover:border-red-500/40 text-white hover:text-red-500 transition-all group pointer-events-auto"
+                            >
+                                <X size={20} className="group-hover:rotate-90 transition-transform" />
+                            </button>
+
+                            <div className="h-full">
+                                {selectedGame === 'rhythm' ? (
+                                    <RhythmMaster onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : selectedGame === 'harmony' ? (
+                                    <HarmonyMatch onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : selectedGame === 'synth' ? (
+                                    <SynthPad onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : selectedGame === 'runner' ? (
+                                    <LyricRunner onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : selectedGame === 'hunter' ? (
+                                    <FreqHunter onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : selectedGame === 'beat' ? (
+                                    <BeatMachine onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                ) : (
+                                    <EchoHero onBack={() => setSelectedGame(null)} isMuted={isMuted} />
+                                )}
+                            </div>
                         </motion.div>
                     )}
                 </AnimatePresence>

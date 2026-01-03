@@ -24,8 +24,8 @@ const Contact: React.FC = () => {
                                 <Mail size={32} />
                             </div>
                             <h3 className="text-xl font-heading text-white mb-2">Email Us</h3>
-                            <a href="mailto:jeromemoses220@gmail.com" className="text-gray-400 hover:text-gold-primary transition-colors text-lg">
-                                jeromemoses220@gmail.com
+                            <a href="mailto:surpport@gyaviira.vercel.app" className="text-gray-400 hover:text-gold-primary transition-colors text-lg">
+                                surpport@gyaviira.vercel.app
                             </a>
                         </motion.div>
 
