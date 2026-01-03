@@ -13,6 +13,7 @@ const MusicEffects: React.FC = () => {
     const [trail, setTrail] = useState<Note[]>([]);
     const [cornerNotes, setCornerNotes] = useState<Note[]>([]);
     const [isCornerEffectActive, setIsCornerEffectActive] = useState(false);
+    const audioRef = React.useRef<HTMLAudioElement | null>(null);
 
     const icons = [
         <Music size={16} />,
@@ -65,6 +66,20 @@ const MusicEffects: React.FC = () => {
         }, 400);
 
         return () => clearInterval(interval);
+    }, [isCornerEffectActive]);
+
+    useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio('https://cdn.pixabay.com/audio/2024/02/09/audio_d0a1a0b3a3.mp3');
+            audioRef.current.loop = true;
+            audioRef.current.volume = 0.4;
+        }
+
+        if (isCornerEffectActive) {
+            audioRef.current.play().catch(e => console.log("Audio play blocked", e));
+        } else {
+            audioRef.current.pause();
+        }
     }, [isCornerEffectActive]);
 
     return (

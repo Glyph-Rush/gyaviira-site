@@ -177,6 +177,76 @@ const LYRIC_TEMPLATES = {
             "Pulsing forward.",
             "System evolved."
         ]
+    },
+    rhythm: {
+        intro: [
+            "Deep in the veins of the obsidian night",
+            "Rhythm emerges, the weaver of light",
+            "A frequency born from the silence",
+            "The master conductor of all we see",
+            "The heartbeat of everything, wild and free",
+            "A sacred and sonic alliance"
+        ],
+        verse: [
+            "Synchronized souls in the dance of the ages",
+            "Writing the future on historical pages",
+            "The beat is the anchor, the tether",
+            "Unfolding the patterns of grace and fate",
+            "The keys to the Kingdom, the golden gate",
+            "As we pull the foundations together",
+            "A polyrhythmic power, a spiritual flow",
+            "Igniting the spark that will finally glow",
+            "Surviving the wintery weather"
+        ],
+        chorus: [
+            "The rhythm is coming, the rhythm is here",
+            "Banishing shadows and banishing fear",
+            "Collective and cosmic vibration",
+            "Harmony rising, the signal is clear",
+            "The music the master is whispering near",
+            "The soul of a unified nation"
+        ],
+        outro: [
+            "Vibration locked.",
+            "Rhythm sustained.",
+            "Harmony peaks.",
+            "Pulse unified."
+        ]
+    },
+    wisdom: {
+        intro: [
+            "Whispers of wisdom from ages past",
+            "A knowledge that's built to always last",
+            "The voices of elders remain",
+            "Deep in the marrow, deep in the bone",
+            "The greatest secrets that ever were known",
+            "Relieving the burden and pain"
+        ],
+        verse: [
+            "Searching the echoes for ancient keys",
+            "The sound of the spirit among the trees",
+            "A path that was carved in the stone",
+            "The truth is a river that never dries",
+            "The light of the universe in our eyes",
+            "A power we've always known",
+            "Decoding the symbols of grace and truth",
+            "Restoring the vision and fire of youth",
+            "To sit on the ancestral throne"
+        ],
+        chorus: [
+            "Wisdom is rising, the world is awake",
+            "The chains of the silence are ready to break",
+            "Ancestral light in the dark",
+            "The spirit of Zephyros, wide and deep",
+            "The promises that the creator will keep",
+            "Igniting the celestial spark"
+        ],
+        outro: [
+            "Wisdom accessed.",
+            "Lore deepens.",
+            "Truth revealed.",
+            "Ancestors smile."
+        ]
     }
 };
 
@@ -244,25 +314,27 @@ const PulseLyrics: React.FC = () => {
         else if (input.includes('zephyros') || input.includes('future') || input.includes('cosmic')) generateLyrics('zephyros');
         else if (input.includes('heritage') || input.includes('root') || input.includes('ancestor') || input.includes('history')) generateLyrics('heritage');
         else if (input.includes('innovation') || input.includes('tech') || input.includes('digital') || input.includes('circuit')) generateLyrics('innovation');
+        else if (input.includes('rhythm') || input.includes('beat') || input.includes('vibration') || input.includes('pulse')) generateLyrics('rhythm');
+        else if (input.includes('wisdom') || input.includes('lore') || input.includes('truth') || input.includes('elder')) generateLyrics('wisdom');
         else {
             setStatus("THEME NOT FOUND. RE-RE-INITIALIZING...");
-            setTimeout(() => setStatus("TRY: 'FAITH', 'RESILIENCE', 'ZEPHYROS', 'HERITAGE', or 'INNOVATION'"), 1500);
+            setTimeout(() => setStatus("TRY: 'FAITH', 'RESILIENCE', 'ZEPHYROS', 'RHYTHM', or 'WISDOM'"), 1500);
             setTimeout(() => setStatus(null), 4000);
         }
         setInputText('');
     };
 
     return (
-        <div className="fixed bottom-6 left-6 z-50">
+        <div className="fixed bottom-24 right-6 z-50">
             <AnimatePresence>
                 {!isOpen && (
                     <motion.button
                         initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
                         whileHover={{ scale: 1.1 }}
                         onClick={() => setIsOpen(true)}
-                        className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full shadow-[0_0_30px_rgba(6,182,212,0.4)] flex items-center justify-center text-white relative group"
+                        className="w-16 h-16 bg-gradient-to-br from-gold-primary to-gold-dark rounded-full shadow-[0_0_30px_rgba(212,175,55,0.4)] flex items-center justify-center text-black relative group"
                     >
-                        <div className="absolute inset-0 rounded-full bg-cyan-400 opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-1000"></div>
+                        <div className="absolute inset-0 rounded-full bg-gold-light opacity-0 group-hover:opacity-100 animate-ping transition-opacity duration-1000"></div>
                         <Mic2 size={28} />
                     </motion.button>
                 )}
@@ -271,28 +343,28 @@ const PulseLyrics: React.FC = () => {
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
-                        initial={{ opacity: 0, x: -50, scale: 0.9 }}
+                        initial={{ opacity: 0, x: 50, scale: 0.9 }}
                         animate={{ opacity: 1, x: 0, scale: 1 }}
-                        exit={{ opacity: 0, x: -50, scale: 0.9 }}
-                        className="w-[350px] md:w-[400px] h-[550px] bg-[#050505]/95 backdrop-blur-2xl border border-cyan-500/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+                        exit={{ opacity: 0, x: 50, scale: 0.9 }}
+                        className="w-[350px] md:w-[400px] h-[550px] bg-[#050505]/95 backdrop-blur-2xl border border-gold-primary/20 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
                     >
-                        <div className="bg-gradient-to-r from-cyan-950/40 to-black p-5 flex justify-between items-center border-b border-cyan-500/10">
+                        <div className="bg-gradient-to-r from-gold-dark/20 to-black p-5 flex justify-between items-center border-b border-gold-primary/10">
                             <div className="flex items-center gap-4">
-                                <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/30 relative">
-                                    <Waves size={20} className="text-cyan-400 animate-pulse" />
+                                <div className="w-10 h-10 rounded-full bg-gold-primary/10 flex items-center justify-center border border-gold-primary/30 relative">
+                                    <Waves size={20} className="text-gold-primary animate-pulse" />
                                 </div>
                                 <div>
-                                    <h3 className="font-impact text-cyan-400 text-lg tracking-tighter uppercase">Pulse AI</h3>
-                                    <span className="text-[9px] text-cyan-700 font-mono tracking-[0.2em]">LYRIC ENGINE V1.0</span>
+                                    <h3 className="font-impact text-gold-primary text-lg tracking-tighter uppercase">Pulse AI</h3>
+                                    <span className="text-[9px] text-gold-dark font-mono tracking-[0.2em]">LYRIC ENGINE V2.0</span>
                                 </div>
                             </div>
-                            <button onClick={() => setIsOpen(false)} className="text-cyan-900 hover:text-cyan-400 transition-colors"><X size={20} /></button>
+                            <button onClick={() => setIsOpen(false)} className="text-gray-500 hover:text-gold-primary transition-colors"><X size={20} /></button>
                         </div>
 
                         <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
                             {output.length === 0 && !status && (
                                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 opacity-40">
-                                    <Music size={48} className="text-cyan-500" />
+                                    <Music size={48} className="text-gold-primary" />
                                     <p className="font-mono text-xs uppercase tracking-widest px-10">Input a theme to generate futuristic verses...</p>
                                 </div>
                             )}
@@ -306,11 +378,11 @@ const PulseLyrics: React.FC = () => {
                                                     key={i}
                                                     animate={{ height: [10, 30, 10] }}
                                                     transition={{ repeat: Infinity, duration: 0.8, delay: i * 0.1 }}
-                                                    className="w-1 bg-cyan-500 rounded-full"
+                                                    className="w-1 bg-gold-primary rounded-full"
                                                 />
                                             ))}
                                         </div>
-                                        <p className="font-mono text-[10px] text-cyan-500 uppercase animate-pulse">{status}</p>
+                                        <p className="font-mono text-[10px] text-gold-primary uppercase animate-pulse">{status}</p>
                                     </div>
                                 </div>
                             )}
@@ -330,7 +402,7 @@ const PulseLyrics: React.FC = () => {
                             )}
                         </div>
 
-                        <div className="p-5 bg-black/50 border-t border-cyan-500/10">
+                        <div className="p-5 bg-black/50 border-t border-gold-primary/10">
                             <div className="relative">
                                 <input
                                     type="text"
@@ -338,12 +410,12 @@ const PulseLyrics: React.FC = () => {
                                     onChange={(e) => setInputText(e.target.value)}
                                     onKeyPress={(e) => e.key === 'Enter' && handleInput()}
                                     placeholder="Enter theme (e.g. Faith)"
-                                    className="w-full bg-cyan-950/10 border border-cyan-500/20 text-cyan-100 rounded-xl py-3 pl-5 pr-12 focus:outline-none focus:border-cyan-500/60 transition-all font-mono text-xs placeholder:text-cyan-900"
+                                    className="w-full bg-gold-dark/10 border border-gold-primary/20 text-gold-light rounded-xl py-3 pl-5 pr-12 focus:outline-none focus:border-gold-primary/60 transition-all font-mono text-xs placeholder:text-gold-dark"
                                 />
                                 <button
                                     onClick={handleInput}
                                     disabled={isGenerating}
-                                    className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-cyan-500 hover:bg-cyan-400 flex items-center justify-center transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg bg-gold-primary hover:bg-gold-light flex items-center justify-center transition-all shadow-[0_0_15px_rgba(212,175,55,0.3)] ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     <Zap size={16} className="text-black" />
                                 </button>

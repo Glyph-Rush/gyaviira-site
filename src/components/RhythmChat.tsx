@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bot, Sparkles, Lock, AlertTriangle, Search, Terminal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 interface Message {
     id: number;
@@ -180,6 +181,11 @@ const KNOWLEDGE_BASE = [
     { keys: ['ai personality', 'are you nice', 'friendly'], response: "I am programmed to be exactly what the Foundation needs: Helpful, Expert, and Harmonious." },
     { keys: ['what is zephyros like'], response: "Imagine a world where the wind plays the trees like harps and the ground pulses with a steady, loving beat. That is our inspiration." },
     { keys: ['customer service', 'problem', 'fix'], response: "I'll do my best! If I can't solve it, our team at the [Contact Portal](/contact) will make it right. What's the issue?", action: '/contact' },
+    { keys: ['streaming', 'spotify', 'apple music'], response: "We are expanding our digital footprint. Currently, our core transmissions are exclusive to the Foundation portals, but global streaming cycles are being prepared." },
+    { keys: ['academy', 'lessons', 'school'], response: "The **Gyaviira Music Academy** is our educational arm. We offer structured learning paths for Kora, Djembe, and Theory. Check the [About Page](/about) for details." },
+    { keys: ['collaboration', 'work together', 'partner'], response: "We believe in the power of unity. If your vision aligns with our rhythmic pillars, send a transmission via the [Contact Portal](/contact)." },
+    { keys: ['quality control', 'guarantee', 'broken'], response: "Excellence is a foundation stone here. If an instrument or piece of apparel doesn't meet the legacy standard, we will rectify it immediately." },
+    { keys: ['global reach', 'tours', 'events'], response: "Our movement is borderless. We are planning a 'Zephyros Live' tour cycle for the upcoming solar year. Stay tuned to the [Newsletter](/newsletter)." },
 ];
 
 const ALL_COMMANDS = [
@@ -197,6 +203,11 @@ const ALL_COMMANDS = [
     "--- LEGACY ---",
     "/rhythm - Meaning of Rhythm", "/harmony - Spirit of Unity", "/wisdom - Ancestral wisdom", "/mentor - Join program", "/outreach - Community work"
 ];
+
+const ADMIN_COMMANDS = ['/status', '/ping', '/analyze', '/clear'];
+
+const ADMIN_DISCLAIMER = `{Disclaimer: 
+You are not An ADMIN}`;
 
 const JOKES = [
     "Why was the guitarist arrested? For fingering A minor.",
@@ -223,6 +234,7 @@ const BLESSINGS = [
 ];
 
 const RhythmChat: React.FC = () => {
+    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState<Message[]>([
@@ -238,6 +250,7 @@ const RhythmChat: React.FC = () => {
     const [violationCount, setViolationCount] = useState(0);
     const [isLocked, setIsLocked] = useState(false);
     const [unlockTime, setUnlockTime] = useState<Date | null>(null);
+    const [showFlyer, setShowFlyer] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -357,6 +370,13 @@ const RhythmChat: React.FC = () => {
             let res = "Unrecognized command. Type /cmd for a list of valid directives.";
             let action: any = null;
 
+            // Admin Command Check
+            if (ADMIN_COMMANDS.includes(cmd) && (!user || user.role !== 'admin')) {
+                setMessages(prev => [...prev, { id: Date.now(), text: ADMIN_DISCLAIMER, sender: 'bot', timestamp: new Date(), isError: true }]);
+                setIsTyping(false);
+                return;
+            }
+
             if (cmd === '/clear') {
                 setMessages([{ id: Date.now(), text: "System memory reset. All buffers cleared.", sender: 'bot', timestamp: new Date(), isSystem: true }]);
                 setIsTyping(false);
@@ -385,7 +405,8 @@ const RhythmChat: React.FC = () => {
 
             // STORE DETAILS
             else if (cmd === '/prices') res = "**PRICE LIST**:\n* Signature Caps: $25\n* Member Tees: $30\n* Impact Hoodies: $55\n* Heritage Koras: $450\n* Foundation Djembes: $180";
-            else if (cmd === '/flyer' || cmd === '/download') { res = "Directing you to the Store to download the Foundation Flyer."; action = () => navigate('/store'); }
+            else if (cmd === '/flyer') { res = "Initializing flyer transmission... Visual interface opening."; setTimeout(() => setShowFlyer(true), 1000); }
+            else if (cmd === '/download') { res = "Directing you to the Store to download the Foundation Flyer."; action = () => navigate('/store'); }
             else if (cmd === '/sizes') res = "**SIZE GUIDE**: Our apparel uses a premium tailored fit. We recommend ordering your true size, or sizing up for a relaxed 'Impact' fit.";
             else if (cmd === '/payment') res = "**PAYMENT**: We accept all major credit cards, secure digital wallets, and regional mobile money options at checkout.";
             else if (cmd === '/shipping') res = "**SHIPPING**: Global shipping active. Standard time 7-14 solar cycles via our secure 'Transmission' logistics.";
@@ -508,6 +529,34 @@ const RhythmChat: React.FC = () => {
                                 )}
                             </div>
                         </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    {showFlyer && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                            <motion.div
+                                initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                                onClick={() => setShowFlyer(false)}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-md"
+                            />
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
+                                className="bg-black-soft border border-gold-primary/30 rounded-3xl p-2 max-w-2xl w-full relative overflow-hidden"
+                            >
+                                <button
+                                    onClick={() => setShowFlyer(false)}
+                                    className="absolute top-4 right-4 z-10 w-10 h-10 bg-black/50 hover:bg-gold-primary text-white hover:text-black rounded-full flex items-center justify-center transition-all"
+                                >
+                                    <X size={24} />
+                                </button>
+                                <img src="/src/assets/download_menu.png" alt="Foundation Flyer" className="w-full h-auto rounded-2xl" />
+                                <div className="p-6 text-center">
+                                    <h2 className="font-impact text-2xl text-gold-primary tracking-widest uppercase mb-2">Project Flyer</h2>
+                                    <p className="text-gray-400 text-sm font-mono uppercase">Scanning completed. Download available via main terminal.</p>
+                                </div>
+                            </motion.div>
+                        </div>
                     )}
                 </AnimatePresence>
             </div>
