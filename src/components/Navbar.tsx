@@ -39,7 +39,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${scrolled ? 'glass-card py-4 bg-black/80' : 'bg-transparent py-6'}`}>
-      <div className="container mx-auto flex justify-between items-center">
+      <div className="px-4 md:px-8 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3 group">
           <img src={logo} alt="Gyaviira Logo" className="h-16 md:h-20 rounded-full border-2 border-transparent group-hover:border-gold-primary transition-all duration-500 shadow-[0_0_15px_rgba(212,175,55,0.2)] group-hover:shadow-[0_0_25px_rgba(212,175,55,0.6)]" />
           <span className="text-3xl md:text-4xl font-cursive text-gold-primary font-bold tracking-wider hidden sm:block drop-shadow-md group-hover:text-gold-light transition-colors">Gyaviira</span>
