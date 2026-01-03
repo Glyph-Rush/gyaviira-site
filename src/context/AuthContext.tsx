@@ -4,12 +4,18 @@ interface User {
     id: string;
     email: string;
     username: string;
+    password?: string;
     profilePic: string | null;
     bio?: string;
     joinedDate: string;
     role: 'user' | 'admin';
     isBanned?: boolean;
     isVerified?: boolean;
+    preferences: {
+        musicAlerts: boolean;
+        communityMentions: boolean;
+        storeExclusives: boolean;
+    };
 }
 
 interface AuthContextType {
@@ -23,6 +29,7 @@ interface AuthContextType {
     deleteUser: (id: string) => void;
     updateUserRole: (id: string, role: 'user' | 'admin') => void;
     verifyUser: (id: string) => void;
+    updatePreferences: (prefs: Partial<User['preferences']>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,7 +58,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     profilePic: null,
                     joinedDate: '01/01/2026',
                     role: 'admin',
-                    isVerified: true
+                    isVerified: true,
+                    password: 'Luganda_pop_345',
+                    preferences: {
+                        musicAlerts: true,
+                        communityMentions: true,
+                        storeExclusives: true
+                    }
+                },
+                {
+                    id: 'foundation-02',
+                    email: 'jerome@gyaviira.com',
+                    username: 'Jerome Moses',
+                    profilePic: null,
+                    joinedDate: '01/01/2026',
+                    role: 'admin',
+                    isVerified: true,
+                    password: 'Luganda_pop_345',
+                    preferences: {
+                        musicAlerts: true,
+                        communityMentions: true,
+                        storeExclusives: true
+                    }
                 }
             ];
             setAllUsers(initialUsers);
@@ -91,25 +119,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return { success: false, message: 'Invalid symbols in signature. Only ( _ . - ` ) allowed.' };
         }
 
-        // Find existing user or create new
-        const existingUser = allUsers.find(u => u.email === email || u.username === username);
+        // Find existing user
+        const existingUser = allUsers.find(u => u.username === username || u.email === email);
+
         if (existingUser) {
             if (existingUser.isBanned) {
                 return { success: false, message: 'Connection Terminated: Your signal has been banned.' };
+            }
+            if (password && existingUser.password && existingUser.password !== password) {
+                return { success: false, message: 'Encryption Mismatch: Invalid password.' };
             }
             setUser(existingUser);
             localStorage.setItem('gyaviira_user', JSON.stringify(existingUser));
             return { success: true };
         }
 
+        // Only allow new account creation if password is provided
+        if (!password) {
+            return { success: false, message: 'Initialization Failed: Password required for new signature.' };
+        }
+
         const newUser: User = {
             id: Math.random().toString(36).substr(2, 9),
             email,
             username,
+            password,
             profilePic: null,
             joinedDate: new Date().toLocaleDateString(),
             role: 'user',
-            isVerified: false
+            isVerified: false,
+            preferences: {
+                musicAlerts: true,
+                communityMentions: true,
+                storeExclusives: false
+            }
         };
 
         const updatedAll = [...allUsers, newUser];
@@ -182,8 +225,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     };
 
+    const updatePreferences = (prefs: Partial<User['preferences']>) => {
+        if (!user) return;
+        const updatedUser = { ...user, preferences: { ...user.preferences, ...prefs } };
+        setUser(updatedUser);
+        const updatedAll = allUsers.map(u => u.id === user.id ? updatedUser : u);
+        setAllUsers(updatedAll);
+        localStorage.setItem('gyaviira_user', JSON.stringify(updatedUser));
+        localStorage.setItem('gyaviira_all_users', JSON.stringify(updatedAll));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, allUsers, login, logout, updateProfilePic, updateUsername, banUser, deleteUser, updateUserRole, verifyUser }}>
+        <AuthContext.Provider value={{ user, allUsers, login, logout, updateProfilePic, updateUsername, banUser, deleteUser, updateUserRole, verifyUser, updatePreferences }}>
             {children}
         </AuthContext.Provider>
     );
