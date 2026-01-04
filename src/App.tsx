@@ -17,6 +17,8 @@ import CommunityChat from './pages/CommunityChat.tsx';
 import Auth from './pages/Auth.tsx';
 import AdminPanel from './pages/AdminPanel.tsx';
 import Checkout from './pages/Checkout.tsx';
+import Dashboard from './pages/Dashboard.tsx';
+import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
@@ -52,12 +54,11 @@ function AppContent() {
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
       <RhythmChat />
       <PulseLyrics />
-      <footer className="bg-black-soft py-10 text-center border-t border-gray-900 mt-20">
-        <p className="text-gray-500">© 2026 <span className="font-cursive text-gold-primary text-xl">Gyaviira</span> Music Foundation. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
