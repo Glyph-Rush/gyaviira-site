@@ -18,6 +18,8 @@ import Auth from './pages/Auth.tsx';
 import AdminPanel from './pages/AdminPanel.tsx';
 import Checkout from './pages/Checkout.tsx';
 import Dashboard from './pages/Dashboard.tsx';
+import Privacy from './pages/Privacy.tsx';
+import Terms from './pages/Terms.tsx';
 import Footer from './components/Footer';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
@@ -55,6 +57,8 @@ function AppContent() {
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
       </Routes>
       <RhythmChat />
       <PulseLyrics />
