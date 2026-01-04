@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Sparkles, Chrome, RefreshCcw } from 'lucide-react';
+import { Mail, Lock, User, Sparkles } from 'lucide-react';
 
 const Auth: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -10,40 +10,42 @@ const Auth: React.FC = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
-    const [isSyncing, setIsSyncing] = useState(false);
-    const { login } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const { login, signup } = useAuth();
     const navigate = useNavigate();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setIsLoading(true);
 
-        const result = login(email, isLogin ? (username || email.split('@')[0]) : username, password);
-
-        if (result.success) {
-            navigate('/account');
-        } else {
-            setError(result.message || 'Authentication failed.');
-        }
-    };
-
-    const handleGoogleSync = () => {
-        setIsSyncing(true);
-        setError(null);
-
-        // Simulate network delay
-        setTimeout(() => {
-            const googleEmail = 'google_user@gmail.com';
-            const googleUsername = 'Google_Sync_User';
-            const result = login(googleEmail, googleUsername);
-
-            if (result.success) {
-                navigate('/account');
+        try {
+            if (isLogin) {
+                const result = await login(email, password);
+                if (result.success) {
+                    navigate('/account');
+                } else {
+                    setError(result.message || 'Authentication failed.');
+                }
             } else {
-                setError(result.message || 'Google Sync failed.');
-                setIsSyncing(false);
+                const result = await signup(email, username, password);
+                if (result.success) {
+                    setError(null);
+                    setIsLogin(true);
+                    setEmail('');
+                    setUsername('');
+                    setPassword('');
+                    // Show success message
+                    navigate('/auth');
+                } else {
+                    setError(result.message || 'Registration failed.');
+                }
             }
-        }, 1500);
+        } catch (err) {
+            setError('Connection error. Please try again.');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -102,12 +104,12 @@ const Auth: React.FC = () => {
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gold-primary/40" size={18} />
                             <input
-                                type="email"
+                                type={isLogin ? "text" : "email"}
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="name@domain.com"
-                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-gold-primary/50 transition-all font-mono text-sm"
+                                placeholder={isLogin ? "username or email@domain.com" : "name@domain.com"}
+                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-gold-primary/50 transition-all font-mono text-sm min-h-[56px] touch-manipulation"
                             />
                         </div>
                     </div>
@@ -127,32 +129,14 @@ const Auth: React.FC = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="w-full btn-gold py-5 text-sm tracking-[0.2em] font-bold shadow-gold mt-4">
-                        {isLogin ? 'ESTABLISH LINK' : 'REGISTER SIGNATURE'}
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="w-full btn-gold py-5 text-sm tracking-[0.2em] font-bold shadow-gold mt-4 disabled:opacity-50 disabled:cursor-not-allowed min-h-[56px] touch-manipulation"
+                    >
+                        {isLoading ? 'PROCESSING...' : (isLogin ? 'ESTABLISH LINK' : 'REGISTER SIGNATURE')}
                     </button>
                 </form>
-
-                <div className="mt-8">
-                    <div className="relative flex items-center justify-center mb-8">
-                        <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                        <span className="relative bg-black px-4 text-[10px] font-mono text-gray-600 uppercase">OR CONTINUUE WITH</span>
-                    </div>
-
-                    <button
-                        onClick={handleGoogleSync}
-                        disabled={isSyncing}
-                        className="w-full bg-[#111] border border-white/5 hover:border-gold-primary/30 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isSyncing ? (
-                            <RefreshCcw size={20} className="text-gold-primary animate-spin" />
-                        ) : (
-                            <Chrome size={20} className="text-gray-400 group-hover:text-gold-primary transition-colors" />
-                        )}
-                        <span className="text-xs font-mono text-gray-400 group-hover:text-white uppercase tracking-widest">
-                            {isSyncing ? 'Synchronizing...' : 'Google Sync'}
-                        </span>
-                    </button>
-                </div>
 
                 <div className="mt-10 text-center">
                     <button

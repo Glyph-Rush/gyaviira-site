@@ -2,53 +2,93 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download } from 'lucide-react';
+import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download, Trash2, Edit2 } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
+import { supabase } from '../lib/supabase';
 
 interface ChatMessage {
     id: string;
-    user: string;
+    user_id: string;
+    username: string;
     text: string;
-    timestamp: string;
-    isAdmin?: boolean;
-    profilePic?: string | null;
+    created_at: string;
+    is_admin?: boolean;
+    profile_pic?: string | null;
 }
 
 const CommunityChat: React.FC = () => {
-    const { user, allUsers } = useAuth();
+    const { user, allUsers, loading } = useAuth();
     const navigate = useNavigate();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [activeChannel, setActiveChannel] = useState('general-vibe');
     const [showFlyer, setShowFlyer] = useState(false);
+    const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Initial load and "Cloud" Sync Simulation
+    // Redirect to auth if not logged in
     useEffect(() => {
-        const syncMessages = () => {
-            const allStoredMessages = JSON.parse(localStorage.getItem('gyaviira_cloud_chat') || '{}');
-            const channelMessages = allStoredMessages[activeChannel] || [
-                { id: '1', user: 'Zephyros_Prime', text: `Welcome to the #${activeChannel} harmonic collective.`, timestamp: '10:42 AM', isAdmin: true }
-            ];
-            setMessages(channelMessages);
+        if (!loading && !user) navigate('/auth');
+    }, [user, loading, navigate]);
+
+    // Load messages and subscribe to realtime updates
+    useEffect(() => {
+        if (!user) return;
+
+        const loadMessages = async () => {
+            setIsLoadingMessages(true);
+            const { data, error } = await supabase
+                .from('messages')
+                .select('*')
+                .eq('channel', activeChannel)
+                .order('created_at', { ascending: true });
+
+            if (data && !error) {
+                setMessages(data);
+            }
+            setIsLoadingMessages(false);
         };
 
-        syncMessages();
-        const interval = setInterval(syncMessages, 2000); // Polling for cross-tab "cloud" sync
-        return () => clearInterval(interval);
-    }, [activeChannel]);
+        loadMessages();
 
-    useEffect(() => {
-        if (!user) navigate('/auth');
-    }, [user, navigate]);
+        // Subscribe to real-time updates
+        const channel = supabase
+            .channel(`messages:${activeChannel}`)
+            .on(
+                'postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'messages',
+                    filter: `channel=eq.${activeChannel}`
+                },
+                (payload) => {
+                    if (payload.eventType === 'INSERT') {
+                        setMessages(prev => [...prev, payload.new as ChatMessage]);
+                    } else if (payload.eventType === 'DELETE') {
+                        setMessages(prev => prev.filter(msg => msg.id !== payload.old.id));
+                    } else if (payload.eventType === 'UPDATE') {
+                        setMessages(prev => prev.map(msg =>
+                            msg.id === payload.new.id ? payload.new as ChatMessage : msg
+                        ));
+                    }
+                }
+            )
+            .subscribe();
 
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [activeChannel, user]);
+
+    // Auto-scroll on new messages
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
     }, [messages]);
 
-    const handleSendMessage = (e: React.FormEvent) => {
+    const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         const text = inputText.trim();
         if (!text || !user) return;
@@ -60,22 +100,28 @@ const CommunityChat: React.FC = () => {
             return;
         }
 
-        const newMessage: ChatMessage = {
-            id: Date.now().toString(),
-            user: user.username,
-            text: text,
-            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            profilePic: user.profilePic,
-            isAdmin: user.role === 'admin'
-        };
+        // Insert message into Supabase
+        const { error } = await supabase
+            .from('messages')
+            .insert({
+                channel: activeChannel,
+                user_id: user.id,
+                username: user.username,
+                text: text,
+                profile_pic: user.profilePic,
+                is_admin: user.role === 'admin'
+            });
 
-        const allStoredMessages = JSON.parse(localStorage.getItem('gyaviira_cloud_chat') || '{}');
-        const channelMessages = [...(allStoredMessages[activeChannel] || []), newMessage];
-        allStoredMessages[activeChannel] = channelMessages;
-        localStorage.setItem('gyaviira_cloud_chat', JSON.stringify(allStoredMessages));
+        if (!error) {
+            setInputText('');
+        }
+    };
 
-        setMessages(channelMessages);
-        setInputText('');
+    const handleDeleteMessage = async (messageId: string) => {
+        await supabase
+            .from('messages')
+            .delete()
+            .eq('id', messageId);
     };
 
     if (!user) return null;
@@ -115,19 +161,15 @@ const CommunityChat: React.FC = () => {
                                 ACTIVE SIGNALS <Users size={12} />
                             </h3>
                             <div className="space-y-3 px-2">
-                                {['Zephyros_Prime', 'BeatMaker99', 'RhythmQueen', user.username].map((u, i) => {
-                                    const isUserAdmin = allUsers.find(userObj => userObj.username === u)?.role === 'admin' || i === 0;
-                                    return (
-                                        <div key={u} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
-                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                            <span className={`text-[11px] font-mono uppercase tracking-widest ${isUserAdmin ? 'text-gold-primary' : 'text-white'}`}>{u}</span>
-                                            {isUserAdmin && (
-                                                <span className="bg-gold-primary text-black text-[7px] px-1.5 py-0.5 rounded-md font-bold tracking-tighter shadow-sm flex-shrink-0">ADMIN</span>
-                                            )}
-                                            {isUserAdmin && <Crown size={10} className="text-gold-primary" />}
-                                        </div>
-                                    );
-                                })}
+                                {allUsers.slice(0, 8).map((u) => (
+                                    <div key={u.id} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
+                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                                        <span className={`text-[11px] font-mono uppercase tracking-widest truncate flex-1 ${u.role === 'admin' ? 'text-gold-primary' : 'text-white'}`}>{u.username}</span>
+                                        {u.role === 'admin' && (
+                                            <Crown size={10} className="text-gold-primary flex-shrink-0" />
+                                        )}
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -135,11 +177,11 @@ const CommunityChat: React.FC = () => {
                     <div className="mt-auto pt-6 border-t border-white/5">
                         <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
                             <div className="w-10 h-10 rounded-xl bg-gold-dark/20 border border-gold-primary/30 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                {user.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" /> : <User size={20} className="text-gold-primary/40" />}
+                                {user.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" alt={user.username} /> : <User size={20} className="text-gold-primary/40" />}
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <p className="text-[10px] font-bold text-white uppercase tracking-widest truncate">{user.username}</p>
-                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">Master level</p>
+                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">{user.role === 'admin' ? 'Admin Level' : 'Member Level'}</p>
                             </div>
                             <MoreVertical size={14} className="text-gray-600 hover:text-white cursor-pointer" />
                         </div>
@@ -149,7 +191,7 @@ const CommunityChat: React.FC = () => {
                 {/* Main Chat Area */}
                 <div className="flex-1 flex flex-col bg-black relative">
                     {/* Chat Header */}
-                    <div className="h-20 bg-black/40 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-8 z-10">
+                    <div className="h-20 bg-black/40 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-8 z-10">
                         <div className="flex items-center gap-4">
                             <button className="lg:hidden text-gold-primary"><Music size={20} /></button>
                             <div className="flex flex-col">
@@ -173,41 +215,58 @@ const CommunityChat: React.FC = () => {
                     {/* Messages List */}
                     <div
                         ref={scrollRef}
-                        className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar"
+                        className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 md:space-y-8 custom-scrollbar"
                     >
-                        <AnimatePresence initial={false}>
-                            {messages.map((msg) => (
-                                <motion.div
-                                    key={msg.id}
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="flex gap-4 group"
-                                >
-                                    <div className={`w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${msg.isAdmin ? 'bg-gold-primary text-black border-gold-primary' : 'bg-black-soft border-white/10 group-hover:border-gold-primary/30'} overflow-hidden`}>
-                                        {msg.profilePic ? (
-                                            <img src={msg.profilePic} className="w-full h-full object-cover" />
-                                        ) : (
-                                            msg.isAdmin ? <Music size={24} /> : <User size={24} className="text-gray-700" />
-                                        )}
-                                    </div>
-                                    <div className="space-y-1 flex-1">
-                                        <div className="flex items-center gap-3">
-                                            <span className={`text-xs font-impact tracking-widest uppercase ${msg.isAdmin ? 'text-gold-primary' : 'text-white'}`}>{msg.user}</span>
-                                            {allUsers.find(u => u.username === msg.user)?.isVerified && (
-                                                <BadgeCheck size={12} className="text-gold-primary fill-gold-primary/20" />
+                        {isLoadingMessages ? (
+                            <div className="flex items-center justify-center h-full">
+                                <div className="text-gold-primary font-mono text-xs uppercase tracking-widest animate-pulse">Loading transmissions...</div>
+                            </div>
+                        ) : (
+                            <AnimatePresence initial={false}>
+                                {messages.map((msg) => (
+                                    <motion.div
+                                        key={msg.id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="flex gap-3 md:gap-4 group"
+                                    >
+                                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${msg.is_admin ? 'bg-gold-primary text-black border-gold-primary' : 'bg-black-soft border-white/10 group-hover:border-gold-primary/30'} overflow-hidden`}>
+                                            {msg.profile_pic ? (
+                                                <img src={msg.profile_pic} className="w-full h-full object-cover" alt={msg.username} />
+                                            ) : (
+                                                msg.is_admin ? <Music size={20} /> : <User size={20} className="text-gray-700" />
                                             )}
-                                            {msg.isAdmin && <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>}
-                                            <span className="text-[9px] font-mono text-gray-600 uppercase">{msg.timestamp}</span>
                                         </div>
-                                        <p className="text-gray-300 text-sm leading-relaxed font-light break-words">{msg.text}</p>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
+                                        <div className="space-y-1 flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                                                <span className={`text-xs font-impact tracking-widest uppercase ${msg.is_admin ? 'text-gold-primary' : 'text-white'}`}>{msg.username}</span>
+                                                {allUsers.find(u => u.id === msg.user_id)?.isVerified && (
+                                                    <BadgeCheck size={12} className="text-gold-primary fill-gold-primary/20" />
+                                                )}
+                                                {msg.is_admin && <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>}
+                                                <span className="text-[9px] font-mono text-gray-600 uppercase">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+
+                                                {/* Delete button for own messages */}
+                                                {msg.user_id === user.id && (
+                                                    <button
+                                                        onClick={() => handleDeleteMessage(msg.id)}
+                                                        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400"
+                                                        title="Delete message"
+                                                    >
+                                                        <Trash2 size={14} />
+                                                    </button>
+                                                )}
+                                            </div>
+                                            <p className="text-gray-300 text-sm leading-relaxed font-light break-words">{msg.text}</p>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        )}
                     </div>
 
                     {/* Input Area */}
-                    <div className="p-8 pt-0">
+                    <div className="p-4 md:p-8 pt-0">
                         <form
                             onSubmit={handleSendMessage}
                             className="bg-black-soft border border-white/5 rounded-3xl p-2 focus-within:border-gold-primary/30 transition-all flex items-center gap-2 group relative shadow-2xl"
@@ -216,7 +275,7 @@ const CommunityChat: React.FC = () => {
                                 <span className="text-[9px] font-mono text-gold-primary uppercase tracking-widest animate-pulse">TRANSMISSION MODE: ACTIVE</span>
                             </div>
 
-                            <button type="button" className="w-12 h-12 rounded-2xl flex items-center justify-center text-gray-600 hover:text-gold-primary transition-colors hover:bg-white/5">
+                            <button type="button" className="w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center text-gray-600 hover:text-gold-primary transition-colors hover:bg-white/5">
                                 <Plus size={20} />
                             </button>
 
@@ -225,17 +284,17 @@ const CommunityChat: React.FC = () => {
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 placeholder={`Transmission to #${activeChannel}...`}
-                                className="flex-1 bg-transparent border-none text-white focus:ring-0 placeholder:text-gray-700 font-mono text-sm py-4"
+                                className="flex-1 bg-transparent border-none text-white focus:ring-0 placeholder:text-gray-700 font-mono text-sm py-4 min-h-[48px] md:min-h-[56px] touch-manipulation"
                             />
 
                             <div className="flex items-center gap-2 px-2">
-                                <button type="button" className="w-10 h-10 rounded-xl flex items-center justify-center text-gray-600 hover:text-gold-primary transition-colors">
+                                <button type="button" className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-gray-600 hover:text-gold-primary transition-colors">
                                     <Smile size={20} />
                                 </button>
                                 <button
                                     type="submit"
                                     disabled={!inputText.trim()}
-                                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${inputText.trim() ? 'bg-gold-primary text-black shadow-gold scale-100 hover:scale-105' : 'bg-white/5 text-gray-800 scale-90'}`}
+                                    className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all ${inputText.trim() ? 'bg-gold-primary text-black shadow-gold scale-100 hover:scale-105' : 'bg-white/5 text-gray-800 scale-90'}`}
                                 >
                                     <Send size={20} />
                                 </button>
