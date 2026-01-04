@@ -748,80 +748,105 @@ const Games: React.FC = () => {
                                 <motion.div
                                     whileHover={{ y: -10 }}
                                     onClick={() => setSelectedGame('synth')}
-                                    className="glass-card relative h-[400px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
+                                    className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <div className="absolute inset-0 bg-gold-primary/5 group-hover:bg-gold-primary/10 transition-colors"></div>
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
-                                        <div className="w-10 h-10 bg-gold-primary/20 rounded-lg flex items-center justify-center text-gold-primary">
-                                            <Mic2 size={20} />
+                                        <div className="w-12 h-12 bg-gold-primary rounded-xl flex items-center justify-center text-black mb-2 shadow-gold">
+                                            <Mic2 size={24} />
                                         </div>
-                                        <h3 className="text-3xl font-impact text-white uppercase tracking-tighter">Synth Pad</h3>
-                                        <p className="text-gray-500 text-xs">Melodic expression grid.</p>
+                                        <h3 className="text-5xl font-impact text-white uppercase tracking-tighter">Synth Pad</h3>
+                                        <p className="text-gray-400 font-light leading-relaxed">Live melodic expression grid. Build harmonic progressions in real-time.</p>
+                                        <div className="flex items-center gap-2 text-gold-primary font-bold text-xs tracking-widest pt-4">
+                                            <Play size={14} className="fill-gold-primary" /> CREATE SOUND
+                                        </div>
                                     </div>
+                                    <div className="absolute top-6 right-6 border border-white/20 px-3 py-1 rounded-full text-[10px] text-white/40 uppercase font-mono">Creative Type-C</div>
                                 </motion.div>
 
                                 {/* Lyric Runner Card */}
                                 <motion.div
                                     whileHover={{ y: -10 }}
                                     onClick={() => setSelectedGame('runner')}
-                                    className="glass-card relative h-[400px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
+                                    className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-colors"></div>
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
-                                        <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center text-white">
-                                            <Activity size={20} />
+                                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-black mb-2 shadow-2xl">
+                                            <Activity size={24} />
                                         </div>
-                                        <h3 className="text-3xl font-impact text-white uppercase tracking-tighter">Lyric Runner</h3>
-                                        <p className="text-gray-500 text-xs">Anthem speed-reading.</p>
+                                        <h3 className="text-5xl font-impact text-white uppercase tracking-tighter">Lyric Runner</h3>
+                                        <p className="text-gray-400 font-light leading-relaxed">High-speed anthem decoding. Test your reading velocity against sacred hymns.</p>
+                                        <div className="flex items-center gap-2 text-white font-bold text-xs tracking-widest pt-4">
+                                            <Play size={14} className="fill-white" /> START SPRINT
+                                        </div>
                                     </div>
+                                    <div className="absolute top-6 right-6 border border-white/20 px-3 py-1 rounded-full text-[10px] text-white/40 uppercase font-mono">Speed Type-D</div>
                                 </motion.div>
 
                                 {/* Freq Hunter Card */}
                                 <motion.div
                                     whileHover={{ y: -10 }}
                                     onClick={() => setSelectedGame('hunter')}
-                                    className="glass-card relative h-[400px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
+                                    className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <div className="absolute inset-0 bg-cyan-500/5 group-hover:bg-cyan-500/10 transition-colors"></div>
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
-                                        <div className="w-10 h-10 bg-cyan-500/10 rounded-lg flex items-center justify-center text-cyan-500">
-                                            <Sliders size={20} />
+                                        <div className="w-12 h-12 bg-cyan-500 rounded-xl flex items-center justify-center text-black mb-2 shadow-2xl">
+                                            <Sliders size={24} />
                                         </div>
-                                        <h3 className="text-3xl font-impact text-white uppercase tracking-tighter">Freq Hunter</h3>
-                                        <p className="text-gray-500 text-xs">Precision signal locking.</p>
+                                        <h3 className="text-5xl font-impact text-white uppercase tracking-tighter">Freq Hunter</h3>
+                                        <p className="text-gray-400 font-light leading-relaxed">Precision signal acquisition. Hunt down the sacred resonant frequency.</p>
+                                        <div className="flex items-center gap-2 text-cyan-500 font-bold text-xs tracking-widest pt-4">
+                                            <Play size={14} className="fill-cyan-500" /> SCAN FREQUENCIES
+                                        </div>
                                     </div>
+                                    <div className="absolute top-6 right-6 border border-white/20 px-3 py-1 rounded-full text-[10px] text-white/40 uppercase font-mono">Audio Type-E</div>
                                 </motion.div>
 
                                 {/* Beat Machine Card */}
                                 <motion.div
                                     whileHover={{ y: -10 }}
                                     onClick={() => setSelectedGame('beat')}
-                                    className="glass-card relative h-[400px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
+                                    className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <div className="absolute inset-0 bg-purple-500/5 group-hover:bg-purple-500/10 transition-colors"></div>
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
-                                        <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center text-purple-500">
-                                            <Layout size={20} />
+                                        <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center text-black mb-2 shadow-2xl">
+                                            <Layout size={24} />
                                         </div>
-                                        <h3 className="text-3xl font-impact text-white uppercase tracking-tighter">Beat Machine</h3>
-                                        <p className="text-gray-500 text-xs">8-step loop sequencer.</p>
+                                        <h3 className="text-5xl font-impact text-white uppercase tracking-tighter">Beat Machine</h3>
+                                        <p className="text-gray-400 font-light leading-relaxed">Rhythmic loop sequencer. Craft your own 8-step percussion foundations.</p>
+                                        <div className="flex items-center gap-2 text-purple-500 font-bold text-xs tracking-widest pt-4">
+                                            <Play size={14} className="fill-purple-500" /> BUILD RHYTHM
+                                        </div>
                                     </div>
+                                    <div className="absolute top-6 right-6 border border-white/20 px-3 py-1 rounded-full text-[10px] text-white/40 uppercase font-mono">Sequencer Type-F</div>
                                 </motion.div>
 
                                 {/* Echo Hero Card */}
                                 <motion.div
                                     whileHover={{ y: -10 }}
                                     onClick={() => setSelectedGame('echo')}
-                                    className="glass-card relative h-[400px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
+                                    className="glass-card relative h-[500px] rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer"
                                 >
-                                    <div className="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors"></div>
+                                    <img src={store_mobile} className="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 group-hover:scale-110 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
                                     <div className="absolute inset-6 flex flex-col justify-end space-y-4">
-                                        <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center text-red-500">
-                                            <Hash size={20} />
+                                        <div className="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center text-black mb-2 shadow-2xl">
+                                            <Hash size={24} />
                                         </div>
-                                        <h3 className="text-3xl font-impact text-white uppercase tracking-tighter">Echo Hero</h3>
-                                        <p className="text-gray-500 text-xs">Pattern memory training.</p>
+                                        <h3 className="text-5xl font-impact text-white uppercase tracking-tighter">Echo Hero</h3>
+                                        <p className="text-gray-400 font-light leading-relaxed">Neural pattern recognition training. Memorize the sacred sequences.</p>
+                                        <div className="flex items-center gap-2 text-red-500 font-bold text-xs tracking-widest pt-4">
+                                            <Play size={14} className="fill-red-500" /> TRAIN MEMORY
+                                        </div>
                                     </div>
+                                    <div className="absolute top-6 right-6 border border-white/20 px-3 py-1 rounded-full text-[10px] text-white/40 uppercase font-mono">Pattern Type-G</div>
                                 </motion.div>
                             </div>
                         </motion.div>
