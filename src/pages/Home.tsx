@@ -1,17 +1,8 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
 
 const Home: React.FC = () => {
-    const [visits, setVisits] = useState(0);
-
-    useEffect(() => {
-        const currentVisits = parseInt(localStorage.getItem('gyaviira_visits') || '25432');
-        const newVisits = currentVisits + 1;
-        localStorage.setItem('gyaviira_visits', newVisits.toString());
-        setVisits(newVisits);
-    }, []);
 
     return (
         <div className="bg-black-main min-h-screen text-white">
@@ -21,12 +12,11 @@ const Home: React.FC = () => {
             <section className="py-20 bg-black-main relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-gold-primary/20 to-transparent"></div>
                 <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                         {[
-                            { label: 'Site Visits', value: visits, suffix: '+' },
-                            { label: 'Purchases', value: 1248, suffix: '' },
-                            { label: 'Accounts', value: 342, suffix: '' },
-                            { label: 'Transmissions', value: 89, suffix: 'K' }
+                            { label: 'Site Visits', value: '500', suffix: '+' },
+                            { label: 'Purchases', value: '12', suffix: '+' },
+                            { label: 'Transmissions', value: '∞', suffix: '' }
                         ].map((stat, i) => (
                             <motion.div
                                 key={i}

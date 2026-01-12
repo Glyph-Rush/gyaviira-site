@@ -27,10 +27,11 @@ const Footer: React.FC = () => {
                     <div className="space-y-4">
                         <h3 className="text-gold-primary font-impact text-sm uppercase tracking-widest">Quick Access</h3>
                         <div className="flex flex-col gap-2">
-                            {['About', 'Gallery', 'Merch', 'Games', 'Contact'].map(link => (
+                            {['About', 'Chat', 'Gallery', 'Merch', 'Games', 'Contact'].map(link => (
                                 <Link
                                     key={link}
                                     to={`/${link.toLowerCase()}`}
+                                    onClick={() => window.scrollTo(0, 0)}
                                     className="text-gray-400 hover:text-gold-primary transition-colors text-sm"
                                 >
                                     {link}
@@ -43,17 +44,22 @@ const Footer: React.FC = () => {
                     <div className="space-y-4">
                         <h3 className="text-gold-primary font-impact text-sm uppercase tracking-widest">Community</h3>
                         <div className="flex flex-col gap-2">
-                            <Link to="/chat" className="text-gray-400 hover:text-gold-primary transition-colors text-sm">
+                            <Link
+                                to="/chat"
+                                onClick={() => window.scrollTo(0, 0)}
+                                className="text-gray-400 hover:text-gold-primary transition-colors text-sm"
+                            >
                                 Community Chat
                             </Link>
-                            <Link to="/newsletter" className="text-gray-400 hover:text-gold-primary transition-colors text-sm">
+                            <Link
+                                to="/newsletter"
+                                onClick={() => window.scrollTo(0, 0)}
+                                className="text-gray-400 hover:text-gold-primary transition-colors text-sm"
+                            >
                                 Newsletter
                             </Link>
                             <a href="mailto:support@gyaviira.org" className="text-gray-400 hover:text-gold-primary transition-colors text-sm">
                                 Support
-                            </a>
-                            <a href="mailto:socials@gyaviira.org" className="text-gray-400 hover:text-gold-primary transition-colors text-sm">
-                                Social Media Team
                             </a>
                         </div>
                     </div>
@@ -62,16 +68,16 @@ const Footer: React.FC = () => {
                     <div className="space-y-4">
                         <h3 className="text-gold-primary font-impact text-sm uppercase tracking-widest">Connect</h3>
                         <div className="flex gap-3 mb-4">
-                            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
+                            <a href="https://facebook.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
                                 <Facebook size={18} />
                             </a>
-                            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
+                            <a href="https://twitter.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
                                 <Twitter size={18} />
                             </a>
-                            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
+                            <a href="https://instagram.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
                                 <Instagram size={18} />
                             </a>
-                            <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
+                            <a href="https://youtube.com/@GyaviiraMusic" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
                                 <Youtube size={18} />
                             </a>
                         </div>

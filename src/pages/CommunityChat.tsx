@@ -49,6 +49,9 @@ const CommunityChat: React.FC = () => {
 
     const getAvatarForName = (name: string) => {
         if (!name) return 'User';
+        // Admin Override
+        if (name.toLowerCase() === 'jeromemoses220@gmail.com') return 'icon:Music2';
+
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
             hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -175,16 +178,18 @@ const CommunityChat: React.FC = () => {
             return;
         }
 
+        const isFounder = displayName.toLowerCase() === 'jeromemoses220@gmail.com';
+
         // Insert message into Supabase
         const { error } = await supabase
             .from('messages')
             .insert({
                 channel: activeChannel,
                 user_id: null, // Guests only
-                username: displayName,
+                username: isFounder ? "Jerome Moses" : displayName,
                 text: text,
                 profile_pic: getAvatarForName(displayName), // Assign unique emoji
-                is_admin: false
+                is_admin: isFounder
             });
 
         if (error) {
@@ -214,16 +219,16 @@ const CommunityChat: React.FC = () => {
     };
 
     const handleSendAssetMessage = async (asset: string) => {
-        if (!displayName) return;
+        const isFounder = displayName.toLowerCase() === 'jeromemoses220@gmail.com';
         const { error } = await supabase
             .from('messages')
             .insert({
                 channel: activeChannel,
                 user_id: null,
-                username: displayName,
+                username: isFounder ? "Jerome Moses" : displayName,
                 text: asset,
                 profile_pic: getAvatarForName(displayName), // Assign unique emoji
-                is_admin: false
+                is_admin: isFounder
             });
         if (error) {
             console.error("Asset Transmission Error:", error.message);
@@ -349,11 +354,16 @@ const CommunityChat: React.FC = () => {
                                         <div className="space-y-1 flex-1 min-w-0">
                                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                                                 <span className={`text-xs font-impact tracking-widest uppercase ${msg.is_admin ? 'text-gold-primary' : 'text-white'}`}>{msg.username}</span>
-                                                {msg.is_admin && <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>}
+                                                {msg.is_admin && (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>
+                                                        <Star size={10} className="text-gold-primary fill-gold-primary drop-shadow-[0_0_8px_rgba(212,175,55,0.8)]" />
+                                                    </div>
+                                                )}
                                                 <span className="text-[9px] font-mono text-gray-600 uppercase">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
 
                                                 {/* Delete button for own messages */}
-                                                {msg.username === displayName ? (
+                                                {(msg.username === displayName || (displayName.toLowerCase() === 'jeromemoses220@gmail.com' && msg.username === 'Jerome Moses')) ? (
                                                     <button
                                                         onClick={() => handleDeleteMessage(msg.id)}
                                                         className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400"
