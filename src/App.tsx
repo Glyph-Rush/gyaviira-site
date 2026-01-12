@@ -12,12 +12,10 @@ import MusicEffects from './components/MusicEffects';
 import RhythmChat from './components/RhythmChat';
 import PulseLyrics from './components/PulseLyrics';
 import CommunityChat from './pages/CommunityChat.tsx';
-import Auth from './pages/Auth.tsx';
 import Checkout from './pages/Checkout.tsx';
 import Privacy from './pages/Privacy.tsx';
 import Terms from './pages/Terms.tsx';
 import Footer from './components/Footer';
-import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 
 function AppContent() {
@@ -37,7 +35,6 @@ function AppContent() {
         <Route path="/games" element={<Games />} />
 
         <Route path="/chat" element={<CommunityChat />} />
-        <Route path="/auth" element={<Auth />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
@@ -51,13 +48,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+    <CartProvider>
+      <Router>
+        <AppContent />
+      </Router>
+    </CartProvider>
   );
 }
 

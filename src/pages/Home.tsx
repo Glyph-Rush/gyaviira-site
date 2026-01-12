@@ -1,11 +1,9 @@
 import React from 'react';
 import Hero from '../components/Hero';
 import { motion } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 
 const Home: React.FC = () => {
-    const { allUsers } = useAuth();
     const [visits, setVisits] = useState(0);
 
     useEffect(() => {
@@ -27,7 +25,7 @@ const Home: React.FC = () => {
                         {[
                             { label: 'Site Visits', value: visits, suffix: '+' },
                             { label: 'Purchases', value: 1248, suffix: '' },
-                            { label: 'Accounts', value: allUsers.length, suffix: '' },
+                            { label: 'Accounts', value: 342, suffix: '' },
                             { label: 'Transmissions', value: 89, suffix: 'K' }
                         ].map((stat, i) => (
                             <motion.div

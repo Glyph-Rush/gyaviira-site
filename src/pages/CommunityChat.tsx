@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download, Trash2 } from 'lucide-react';
+import { Send, Hash, Users, Zap, Music, Search, Plus, Smile, User, X, Download, Trash2 } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
 import { supabase } from '../lib/supabase';
 
@@ -16,7 +15,6 @@ interface ChatMessage {
 }
 
 const CommunityChat: React.FC = () => {
-    const { user, allUsers, loading } = useAuth();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [activeChannel, setActiveChannel] = useState('general-vibe');
@@ -29,20 +27,14 @@ const CommunityChat: React.FC = () => {
 
     // Initialize Guest Session
     useEffect(() => {
-        // If user is logged in, use their username
-        if (user) {
-            setDisplayName(user.username);
-            return;
-        }
-
-        // Otherwise check session storage for guest name
+        // Check session storage for guest name
         const storedName = sessionStorage.getItem('guest_name');
         if (storedName) {
             setDisplayName(storedName);
         } else {
             setShowNameModal(true);
         }
-    }, [user, loading]);
+    }, []);
 
     const handleSetGuestName = (name: string) => {
         if (!name.trim()) return;
@@ -53,7 +45,6 @@ const CommunityChat: React.FC = () => {
 
     // Load messages and subscribe to realtime updates
     useEffect(() => {
-        if (!user) return;
 
         const loadMessages = async () => {
             setIsLoadingMessages(true);
@@ -113,13 +104,6 @@ const CommunityChat: React.FC = () => {
         const text = inputText.trim();
         if (!text || !displayName) return;
 
-        // Check if banned (only applies to logged in users)
-        if (user?.isBanned) {
-            alert('Your connection has been terminated by the Overseer. Transmission blocked.');
-            setInputText('');
-            return;
-        }
-
         // Command detection
         if (text === '/flyer') {
             setShowFlyer(true);
@@ -132,11 +116,11 @@ const CommunityChat: React.FC = () => {
             .from('messages')
             .insert({
                 channel: activeChannel,
-                user_id: user?.id || null, // Allow null for guests
-                username: displayName, // Use active display name
+                user_id: null, // Guests only
+                username: displayName,
                 text: text,
-                profile_pic: user?.profilePic || null,
-                is_admin: user?.role === 'admin'
+                profile_pic: null,
+                is_admin: false
             });
 
         if (!error) {
@@ -182,20 +166,10 @@ const CommunityChat: React.FC = () => {
                             ))}
                         </div>
 
-                        <div className="space-y-2">
-                            <h3 className="text-[10px] font-mono text-gray-600 uppercase tracking-[0.3em] px-2 flex justify-between items-center">
-                                ACTIVE SIGNALS <Users size={12} />
-                            </h3>
-                            <div className="space-y-3 px-2">
-                                {allUsers.slice(0, 8).map((u) => (
-                                    <div key={u.id} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity cursor-default">
-                                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                                        <span className={`text-[11px] font-mono uppercase tracking-widest truncate flex-1 ${u.role === 'admin' ? 'text-gold-primary' : 'text-white'}`}>{u.username}</span>
-                                        {u.role === 'admin' && (
-                                            <Crown size={10} className="text-gold-primary flex-shrink-0" />
-                                        )}
-                                    </div>
-                                ))}
+                        <div className="space-y-4 px-2">
+                            <div className="bg-gold-primary/5 p-4 rounded-xl border border-gold-primary/10">
+                                <p className="text-[9px] font-mono text-gold-primary/60 uppercase tracking-widest mb-1">Public Frequency</p>
+                                <p className="text-[10px] text-gray-400 leading-relaxed uppercase tracking-widest">Visitors can join without an account. Use /flyer for info.</p>
                             </div>
                         </div>
                     </div>
@@ -204,19 +178,15 @@ const CommunityChat: React.FC = () => {
                     <div className="mt-auto pt-6 border-t border-white/5">
                         <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
                             <div className="w-10 h-10 rounded-xl bg-gold-dark/20 border border-gold-primary/30 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" alt={displayName} /> : <User size={20} className="text-gold-primary/40" />}
+                                <User size={20} className="text-gold-primary/40" />
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <p className="text-[10px] font-bold text-white uppercase tracking-widest truncate">{displayName}</p>
-                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">{user?.role === 'admin' ? 'Admin Level' : user ? 'Member Level' : 'Guest Signal'}</p>
+                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">Guest Signal</p>
                             </div>
-                            {user ? (
-                                <MoreVertical size={14} className="text-gray-600 hover:text-white cursor-pointer" />
-                            ) : (
-                                <button onClick={() => { sessionStorage.removeItem('guest_name'); window.location.reload(); }} className="text-red-500 hover:text-red-400 cursor-pointer" title="Disconnect Signal">
-                                    <X size={14} />
-                                </button>
-                            )}
+                            <button onClick={() => { sessionStorage.removeItem('guest_name'); window.location.reload(); }} className="text-red-500 hover:text-red-400 cursor-pointer" title="Disconnect Signal">
+                                <X size={14} />
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -273,14 +243,11 @@ const CommunityChat: React.FC = () => {
                                         <div className="space-y-1 flex-1 min-w-0">
                                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                                                 <span className={`text-xs font-impact tracking-widest uppercase ${msg.is_admin ? 'text-gold-primary' : 'text-white'}`}>{msg.username}</span>
-                                                {allUsers.find(u => u.id === msg.user_id)?.isVerified && (
-                                                    <BadgeCheck size={12} className="text-gold-primary fill-gold-primary/20" />
-                                                )}
                                                 {msg.is_admin && <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>}
                                                 <span className="text-[9px] font-mono text-gray-600 uppercase">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
 
                                                 {/* Delete button for own messages */}
-                                                {(user && msg.user_id === user.id) || (!user && msg.username === displayName) ? (
+                                                {msg.username === displayName ? (
                                                     <button
                                                         onClick={() => handleDeleteMessage(msg.id)}
                                                         className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400"

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bot, Sparkles, Lock, AlertTriangle, Search, Terminal } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 interface Message {
     id: number;
@@ -234,7 +233,6 @@ const BLESSINGS = [
 ];
 
 const RhythmChat: React.FC = () => {
-    const { user } = useAuth();
     const [isOpen, setIsOpen] = useState(false);
     const [inputText, setInputText] = useState('');
     const [messages, setMessages] = useState<Message[]>([
@@ -371,7 +369,7 @@ const RhythmChat: React.FC = () => {
             let action: any = null;
 
             // Admin Command Check
-            if (ADMIN_COMMANDS.includes(cmd) && (!user || user.role !== 'admin')) {
+            if (ADMIN_COMMANDS.includes(cmd)) {
                 setMessages(prev => [...prev, { id: Date.now(), text: ADMIN_DISCLAIMER, sender: 'bot', timestamp: new Date(), isError: true }]);
                 setIsTyping(false);
                 return;
