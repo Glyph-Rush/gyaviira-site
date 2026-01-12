@@ -259,13 +259,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const deleteUser = async (id: string) => {
-        // Note: This only soft-deletes from profiles
-        // Actual auth.users deletion requires admin API
-        await supabase
-            .from('profiles')
-            .delete()
-            .eq('id', id);
-        await loadAllUsers();
+        // Use the RPC function to delete from both auth.users and profiles
+        const { error } = await supabase.rpc('delete_user', { target_user_id: id });
+
+        if (error) {
+            console.error('Failed to delete user:', error.message);
+            // Fallback for missing RPC or error: try to sign out if it was the current user
+            if (id === user?.id) {
+                await logout();
+            }
+        } else {
+            if (id === user?.id) {
+                await logout();
+            }
+            await loadAllUsers();
+        }
     };
 
     const updateUserRole = async (id: string, role: 'user' | 'admin') => {
@@ -277,11 +285,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const verifyUser = async (id: string) => {
-        await supabase
-            .from('profiles')
-            .update({ is_verified: true })
-            .eq('id', id);
-        await loadAllUsers();
+        const { error } = await supabase.rpc('verify_user', { target_user_id: id });
+
+        if (error) {
+            console.error('Failed to verify user:', error.message);
+        } else {
+            await loadAllUsers();
+        }
     };
 
     const updatePreferences = async (prefs: Partial<User['preferences']>) => {

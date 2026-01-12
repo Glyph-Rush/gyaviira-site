@@ -27,14 +27,15 @@ const Navbar: React.FC = () => {
   }, [location]);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
-    { name: 'Gallery', path: '/gallery' },
-    { name: 'Merch', path: '/store' },
-    { name: 'Instruments', path: '/instruments' },
-    { name: 'Games', path: '/games' },
-    { name: 'Newsletter', path: '/newsletter' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Home', path: '/', external: false },
+    { name: 'About', path: '/about', external: false },
+    { name: 'Gallery', path: '/gallery', external: false },
+    { name: 'Merch', path: '/store', external: false },
+    { name: 'Instruments', path: '/instruments', external: false },
+    { name: 'Tuner', path: '/extensions/GuitarTuner/index.html', external: true },
+    { name: 'Games', path: '/games', external: false },
+    { name: 'Newsletter', path: '/newsletter', external: false },
+    { name: 'Contact', path: '/contact', external: false },
   ];
 
   return (
@@ -42,19 +43,29 @@ const Navbar: React.FC = () => {
       <div className="px-4 md:px-8 flex justify-between items-center">
         <Link to="/" className="flex items-center gap-3 group">
           <img src={logo} alt="Gyaviira Logo" className="h-16 md:h-20 rounded-full border-2 border-transparent group-hover:border-gold-primary transition-all duration-500 shadow-[0_0_15px_rgba(212,175,55,0.2)] group-hover:shadow-[0_0_25px_rgba(212,175,55,0.6)]" />
-          <span className="text-3xl md:text-4xl font-cursive text-gold-primary font-bold tracking-wider hidden sm:block drop-shadow-md group-hover:text-gold-light transition-colors">Gyaviira</span>
+          <span className="text-3xl md:text-4xl font-cursive text-gold-primary font-bold tracking-wider hidden sm:block drop-shadow-md group-hover:text-gold-primary transition-colors">Gyaviira</span>
         </Link>
 
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-4 xl:gap-8">
           {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary ${location.pathname === link.path ? 'text-gold-primary neon-gold' : 'text-white/70'}`}
-            >
-              {link.name}
-            </Link>
+            link.external ? (
+              <a
+                key={link.name}
+                href={link.path}
+                className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary text-white/70`}
+              >
+                {link.name}
+              </a>
+            ) : (
+              <Link
+                key={link.name}
+                to={link.path}
+                className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary ${location.pathname === link.path ? 'text-gold-primary neon-gold' : 'text-white/70'}`}
+              >
+                {link.name}
+              </Link>
+            )
           ))}
           <div className="h-4 w-px bg-white/10 mx-2 hidden xl:block"></div>
 
@@ -153,13 +164,23 @@ const Navbar: React.FC = () => {
           >
             <div className="flex flex-col items-center py-8 gap-6 px-6">
               {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
-                >
-                  {link.name}
-                </Link>
+                link.external ? (
+                  <a
+                    key={link.name}
+                    href={link.path}
+                    className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
+                  >
+                    {link.name}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.name}
+                    to={link.path}
+                    className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
+                  >
+                    {link.name}
+                  </Link>
+                )
               ))}
 
               <div className="w-full h-px bg-white/5 my-2"></div>

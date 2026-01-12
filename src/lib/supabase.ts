@@ -1,9 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://gxrfxbjqlbaexbxmfvdi.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4cmZ4YmpxbGJhZXhieG1mdmRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDMxMTQsImV4cCI6MjA4MzAxOTExNH0.zAmG27r0SsI2R5JumIZgGTt9O0RTJ5yAOQ29_5WXvrA';
+// Use environment variables if available, otherwise fallback to hardcoded values for deployment
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://gxrfxbjqlbaexbxmfvdi.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4cmZ4YmpxbGJhZXhieG1mdmRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc0NDMxMTQsImV4cCI6MjA4MzAxOTExNH0.zAmG27r0SsI2R5JumIZgGTt9O0RTJ5yAOQ29_5WXvrA';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
 
 // Database Types
 export interface Database {

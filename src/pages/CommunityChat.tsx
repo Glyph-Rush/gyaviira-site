@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download, Trash2, Edit2 } from 'lucide-react';
+import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download, Trash2 } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
 import { supabase } from '../lib/supabase';
 

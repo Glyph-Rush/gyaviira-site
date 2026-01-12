@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, X, Plus, Minus, CreditCard, Lock, CheckCircle, ArrowLeft } from 'lucide-react';
+import { ShoppingBag, X, Plus, Minus, CheckCircle, ArrowLeft, AlertTriangle, Mail } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useNavigate } from 'react-router-dom';
 
 const Checkout: React.FC = () => {
-    const { cartItems, totalAmount, removeFromCart, updateQuantity, clearCart } = useCart();
+    const { cartItems, totalAmount, removeFromCart, updateQuantity } = useCart();
     const navigate = useNavigate();
     const [step, setStep] = useState<'cart' | 'payment' | 'success'>('cart');
-    const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'mastercard' | 'visa' | null>(null);
-    const [isProcessing, setIsProcessing] = useState(false);
 
     const parsePrice = (priceStr: string | number): number => {
         if (typeof priceStr === 'number') return priceStr;
@@ -19,19 +17,6 @@ const Checkout: React.FC = () => {
     const handleCheckout = () => {
         if (cartItems.length === 0) return;
         setStep('payment');
-    };
-
-    const handlePayment = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!paymentMethod) return;
-
-        setIsProcessing(true);
-        // Simulate payment processing
-        setTimeout(() => {
-            setIsProcessing(false);
-            setStep('success');
-            clearCart();
-        }, 3000);
     };
 
     if (step === 'success') {
@@ -63,6 +48,24 @@ const Checkout: React.FC = () => {
 
     return (
         <div className="pt-32 pb-20 min-h-screen bg-black overflow-x-hidden">
+            {/* Work in Progress Banner */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="container mx-auto px-6 max-w-6xl mb-8"
+            >
+                <div className="glass-card border-2 border-yellow-500/30 bg-yellow-500/5 p-6 rounded-2xl flex items-start gap-4">
+                    <AlertTriangle size={24} className="text-yellow-500 flex-shrink-0 mt-1" />
+                    <div className="flex-1">
+                        <h3 className="text-yellow-500 font-impact text-lg tracking-wider uppercase mb-2">Payment System Under Construction</h3>
+                        <p className="text-gray-400 text-sm leading-relaxed">
+                            Our secure payment gateway is currently being integrated. You can still browse and add items to your cart.
+                            To place an order now, please contact us directly and we'll process your order manually.
+                        </p>
+                    </div>
+                </div>
+            </motion.div>
+
             <div className="container mx-auto px-6 max-w-6xl">
                 <div className="flex flex-col lg:flex-row gap-12">
 
@@ -135,64 +138,51 @@ const Checkout: React.FC = () => {
                                     <button onClick={() => setStep('cart')} className="text-gold-primary hover:scale-110 transition-transform">
                                         <ArrowLeft size={24} />
                                     </button>
-                                    <h1 className="text-4xl font-impact text-white tracking-widest uppercase">Secure <span className="text-gold-primary">Portal</span></h1>
+                                    <h1 className="text-4xl font-impact text-white tracking-widest uppercase">Order <span className="text-gold-primary">Request</span></h1>
                                 </div>
 
-                                <form onSubmit={handlePayment} className="space-y-8">
-                                    {/* Payment Method Selection */}
+                                {/* Contact Us Instead of Payment */}
+                                <div className="glass-card p-12 rounded-[3rem] border border-gold-primary/20 space-y-8 text-center">
+                                    <div className="w-20 h-20 bg-gold-primary/10 rounded-full flex items-center justify-center mx-auto border border-gold-primary/20">
+                                        <Mail size={40} className="text-gold-primary" />
+                                    </div>
+
                                     <div className="space-y-4">
-                                        <p className="text-[10px] font-mono text-gray-500 uppercase tracking-widest mb-2">Authorized Processors</p>
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                            {[
-                                                { id: 'paypal', label: 'PayPal', color: 'hover:border-blue-500/50' },
-                                                { id: 'mastercard', label: 'Mastercard', color: 'hover:border-orange-500/50' },
-                                                { id: 'visa', label: 'Visa', color: 'hover:border-cyan-500/50' }
-                                            ].map((method) => (
-                                                <div
-                                                    key={method.id}
-                                                    onClick={() => setPaymentMethod(method.id as any)}
-                                                    className={`glass-card p-6 rounded-2xl border transition-all cursor-pointer flex flex-col items-center gap-3 ${paymentMethod === method.id ? 'border-gold-primary bg-gold-primary/5 shadow-gold scale-105' : 'border-white/5 opacity-40 hover:opacity-100 ' + method.color}`}
-                                                >
-                                                    <CreditCard size={24} className={paymentMethod === method.id ? 'text-gold-primary' : 'text-gray-600'} />
-                                                    <span className="text-[10px] font-impact tracking-widest text-white uppercase">{method.label}</span>
+                                        <h2 className="text-3xl font-impact text-white tracking-widest uppercase">Ready to <span className="text-gold-primary">Order?</span></h2>
+                                        <p className="text-gray-400 font-mono text-sm leading-relaxed max-w-lg mx-auto">
+                                            Our automated payment system is currently being upgraded for enhanced security.
+                                            Meanwhile, we're processing orders manually to ensure you don't miss out.
+                                        </p>
+                                    </div>
+
+                                    <div className="glass-card bg-black/40 p-6 rounded-2xl border border-white/5 max-w-md mx-auto">
+                                        <p className="text-[10px] font-mono text-gold-primary uppercase tracking-widest mb-3">Your Order Summary</p>
+                                        <div className="space-y-2 text-left">
+                                            {cartItems.map((item) => (
+                                                <div key={item.id} className="flex justify-between text-sm">
+                                                    <span className="text-gray-400">{item.quantity}x {item.name}</span>
+                                                    <span className="text-white">UGX {(parsePrice(item.price) * item.quantity).toLocaleString()}</span>
                                                 </div>
                                             ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Card Details (Simplified Mockup) */}
-                                    <div className="glass-card p-8 rounded-[2.5rem] border border-white/5 space-y-6 relative overflow-hidden">
-                                        <div className="absolute top-0 right-0 p-4 opacity-5">
-                                            <Lock size={120} />
-                                        </div>
-
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest ml-1">Cardholder Identifier</label>
-                                                <input type="text" required placeholder="ENTIRE GIVEN NAME" className="w-full bg-black/40 border border-white/5 rounded-xl py-4 px-6 text-white font-mono text-xs focus:outline-none focus:border-gold-primary/40 transition-all uppercase placeholder:text-gray-800" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest ml-1">Frequency Address (Email)</label>
-                                                <input type="email" required placeholder="SIGNAL@TRANSMISSION.NET" className="w-full bg-black/40 border border-white/5 rounded-xl py-4 px-6 text-white font-mono text-xs focus:outline-none focus:border-gold-primary/40 transition-all uppercase placeholder:text-gray-800" />
-                                            </div>
-                                            <div className="lg:col-span-2 space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest ml-1">Access String (Card Number)</label>
-                                                <div className="relative">
-                                                    <input type="text" required maxLength={19} placeholder="XXXX XXXX XXXX XXXX" className="w-full bg-black/40 border border-white/5 rounded-xl py-4 px-6 text-white font-mono text-xs focus:outline-none focus:border-gold-primary/40 transition-all placeholder:text-gray-800" />
-                                                    <CreditCard size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-700" />
-                                                </div>
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest ml-1">Expiry Cycle (MM/YY)</label>
-                                                <input type="text" required maxLength={5} placeholder="MM/YY" className="w-full bg-black/40 border border-white/5 rounded-xl py-4 px-6 text-white font-mono text-xs focus:outline-none focus:border-gold-primary/40 transition-all placeholder:text-gray-800" />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <label className="text-[10px] font-mono text-gray-500 uppercase tracking-widest ml-1">Security Node (CVV)</label>
-                                                <input type="password" required maxLength={3} placeholder="CVV" className="w-full bg-black/40 border border-white/5 rounded-xl py-4 px-6 text-white font-mono text-xs focus:outline-none focus:border-gold-primary/40 transition-all placeholder:text-gray-800" />
+                                            <div className="pt-3 border-t border-white/10 flex justify-between font-impact text-lg">
+                                                <span className="text-gold-primary">TOTAL</span>
+                                                <span className="text-gold-primary">UGX {totalAmount.toLocaleString()}</span>
                                             </div>
                                         </div>
                                     </div>
-                                </form>
+
+                                    <button
+                                        onClick={() => navigate('/contact')}
+                                        className="btn-gold px-12 py-6 rounded-2xl font-impact tracking-[0.2em] text-lg hover:scale-105 transition-transform inline-flex items-center gap-3"
+                                    >
+                                        <Mail size={20} />
+                                        CONTACT US TO ORDER
+                                    </button>
+
+                                    <p className="text-[10px] text-gray-600 font-mono leading-relaxed">
+                                        Include your order details when contacting us, and we'll guide you through the payment process.
+                                    </p>
+                                </div>
                             </motion.div>
                         )}
                     </div>
@@ -232,27 +222,14 @@ const Checkout: React.FC = () => {
                                 </button>
                             ) : (
                                 <button
-                                    onClick={handlePayment}
-                                    disabled={!paymentMethod || isProcessing}
-                                    className={`w-full py-6 rounded-2xl font-impact tracking-[0.2em] text-lg transition-all border-2 ${paymentMethod ? 'bg-gold-primary text-black border-gold-primary shadow-gold hover:scale-105' : 'border-white/10 text-gray-700 cursor-not-allowed'} relative overflow-hidden`}
+                                    onClick={() => navigate('/contact')}
+                                    className="w-full py-6 rounded-2xl font-impact tracking-[0.2em] text-lg transition-all bg-gold-primary text-black border-2 border-gold-primary shadow-gold hover:scale-105"
                                 >
-                                    {isProcessing && (
-                                        <motion.div
-                                            initial={{ x: '-100%' }}
-                                            animate={{ x: '1000%' }}
-                                            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-                                            className="absolute top-0 left-0 w-20 h-full bg-white/20 skew-x-12"
-                                        />
-                                    )}
-                                    <span className="relative z-10">{isProcessing ? 'SYNCHRONIZING...' : 'FINALIZE PROTOCOL'}</span>
+                                    CONTACT US TO ORDER
                                 </button>
                             )}
 
                             <div className="flex flex-col items-center gap-4 pt-4">
-                                <div className="flex items-center gap-2 opacity-30 grayscale hover:grayscale-0 transition-all">
-                                    <Lock size={12} className="text-gold-primary" />
-                                    <span className="text-[8px] font-mono text-white uppercase tracking-widest">Quantum Encrypted Transmission</span>
-                                </div>
                                 <p className="text-[8px] text-gray-600 font-mono text-center leading-relaxed">
                                     By finalizing, you agree to the Foundation's Archive Release Protocols and Heritage Terms.
                                 </p>

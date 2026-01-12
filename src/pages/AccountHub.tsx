@@ -27,8 +27,8 @@ const AccountHub: React.FC = () => {
         }
     };
 
-    const handleSave = () => {
-        const success = updateUsername(tempName);
+    const handleSave = async () => {
+        const success = await updateUsername(tempName);
         if (success) {
             setIsEditing(false);
         } else {

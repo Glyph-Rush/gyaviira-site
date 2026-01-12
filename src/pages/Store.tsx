@@ -44,7 +44,13 @@ const Store: React.FC = () => {
                     className="text-center mb-12"
                 >
                     <h1 className="text-4xl md:text-6xl font-heading text-white mb-4">Foundation Store</h1>
-                    <p className="text-gray-400 text-lg mb-10">Wear the legacy. Support the mission.</p>
+                    <p className="text-gray-400 text-lg mb-8">Wear the legacy. Support the mission.</p>
+
+                    {/* WIP Banner */}
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 mb-10">
+                        <span className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></span>
+                        <span className="text-xs font-mono uppercase tracking-widest">Payment System Logic: Manual Processing Active</span>
+                    </div>
 
                     {/* Category Filter */}
                     <div className="flex flex-wrap justify-center gap-4">
