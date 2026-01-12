@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Hash, Users, Zap, Music, Search, Plus, Smile, User, X, Download, Trash2 } from 'lucide-react';
+import { Send, Hash, Users, Zap, Music, Search, Plus, Smile, User, X, Download, Trash2, Gift, Star, Heart, Flame, Crown, Music2 } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
 import { supabase } from '../lib/supabase';
 
@@ -24,6 +24,11 @@ const CommunityChat: React.FC = () => {
 
     const [displayName, setDisplayName] = useState('');
     const [showNameModal, setShowNameModal] = useState(false);
+    const [showAssetLibrary, setShowAssetLibrary] = useState(false);
+    const [activeAssetTab, setActiveAssetTab] = useState<'emoji' | 'giphy' | 'custom'>('emoji');
+    const [giphySearch, setGiphySearch] = useState('');
+    const [giphyResults, setGiphyResults] = useState<any[]>([]);
+    const [isSearchingGiphy, setIsSearchingGiphy] = useState(false);
 
     // Initialize Guest Session
     useEffect(() => {
@@ -123,7 +128,10 @@ const CommunityChat: React.FC = () => {
                 is_admin: false
             });
 
-        if (!error) {
+        if (error) {
+            console.error("Transmission Error:", error.message);
+            alert("Transmission Failed: Check your database connection.");
+        } else {
             setInputText('');
         }
     };
@@ -134,6 +142,62 @@ const CommunityChat: React.FC = () => {
             .delete()
             .eq('id', messageId);
     };
+
+    const handleSelectAsset = (asset: string, type: 'text' | 'image' = 'text') => {
+        if (type === 'text') {
+            setInputText(prev => prev + asset);
+        } else {
+            // Plan: If GIF select, send immediately or append as text? Usually GIFs are sent immediately.
+            // For now, let's treat them as text (markdown image or link)
+            handleSendAssetMessage(asset);
+        }
+        setShowAssetLibrary(false);
+    };
+
+    const handleSendAssetMessage = async (asset: string) => {
+        if (!displayName) return;
+        const { error } = await supabase
+            .from('messages')
+            .insert({
+                channel: activeChannel,
+                user_id: null,
+                username: displayName,
+                text: asset,
+                profile_pic: null,
+                is_admin: false
+            });
+        if (error) {
+            console.error("Asset Transmission Error:", error.message);
+        }
+    };
+
+    const searchGiphy = async (query: string) => {
+        if (!query.trim()) return;
+        setIsSearchingGiphy(true);
+        try {
+            // Using a public-intent key (Note: In production this should be an env var)
+            const API_KEY = 'dc6zaTOxFJmzC'; // Public Beta Key
+            const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=12&rating=g`);
+            const { data } = await response.json();
+            setGiphyResults(data || []);
+        } catch (err) {
+            console.error("Giphy Error", err);
+        }
+        setIsSearchingGiphy(false);
+    };
+
+    const CUSTOM_EMOJIS = [
+        { icon: <Crown size={20} className="text-gold-primary" />, label: 'Overseer', code: '👑' },
+        { icon: <Music size={20} className="text-gold-primary" />, label: 'Rhythm', code: '🎵' },
+        { icon: <Zap size={20} className="text-gold-primary" />, label: 'Pulse', code: '⚡' },
+        { icon: <Hash size={20} className="text-gold-primary" />, label: 'Signal', code: '#' },
+        { icon: <Flame size={20} className="text-gold-primary" />, label: 'Vibe', code: '🔥' },
+        { icon: <Star size={20} className="text-gold-primary" />, label: 'Verified', code: '⭐' },
+        { icon: <Heart size={20} className="text-gold-primary" />, label: 'Love', code: '💎' },
+        { icon: <Music2 size={20} className="text-gold-primary" />, label: 'Acoustic', code: '🎸' },
+    ];
+
+    const STANDARD_EMOJIS = ['😊', '😂', '🔥', '🙌', '💯', '🦾', '💎', '🎵', '✨', '⚡', '🚀', '🖤', '👑', '🤝', '🔊', '🎧', '🎸', '🎹', '🌍', '👽'];
 
 
     return (
@@ -257,7 +321,13 @@ const CommunityChat: React.FC = () => {
                                                     </button>
                                                 ) : null}
                                             </div>
-                                            <p className="text-gray-300 text-sm leading-relaxed font-light break-words">{msg.text}</p>
+                                            {msg.text.startsWith('http') && (msg.text.includes('giphy.com') || msg.text.includes('gif')) ? (
+                                                <div className="mt-2 rounded-xl overflow-hidden max-w-sm border border-white/10 shadow-lg">
+                                                    <img src={msg.text} alt="GIF Transmission" className="w-full h-auto" />
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-300 text-sm leading-relaxed font-light break-words">{msg.text}</p>
+                                            )}
                                         </div>
                                     </motion.div>
                                 ))}
@@ -283,12 +353,21 @@ const CommunityChat: React.FC = () => {
                                 type="text"
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        handleSendMessage(e);
+                                    }
+                                }}
                                 placeholder={`Transmission to #${activeChannel}...`}
                                 className="flex-1 bg-transparent border-none text-white focus:ring-0 placeholder:text-gray-700 font-mono text-sm py-4 min-h-[48px] md:min-h-[56px] touch-manipulation"
                             />
 
                             <div className="flex items-center gap-2 px-2">
-                                <button type="button" className="w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center text-gray-600 hover:text-gold-primary transition-colors">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAssetLibrary(!showAssetLibrary)}
+                                    className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center transition-colors ${showAssetLibrary ? 'text-gold-primary bg-gold-primary/10' : 'text-gray-600 hover:text-gold-primary'}`}
+                                >
                                     <Smile size={20} />
                                 </button>
                                 <button
@@ -300,6 +379,117 @@ const CommunityChat: React.FC = () => {
                                 </button>
                             </div>
                         </form>
+
+                        {/* Asset Library Dialogue */}
+                        <AnimatePresence>
+                            {showAssetLibrary && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 20 }}
+                                    className="absolute bottom-24 right-4 md:right-8 w-80 md:w-96 glass-card border border-white/5 rounded-3xl overflow-hidden shadow-2xl z-50 flex flex-col"
+                                >
+                                    {/* Tabs */}
+                                    <div className="flex border-b border-white/5 bg-black/40">
+                                        {[
+                                            { id: 'custom', label: 'GYAVIIRA', icon: <Crown size={12} /> },
+                                            { id: 'giphy', label: 'GIPHY', icon: <Gift size={12} /> },
+                                            { id: 'emoji', label: 'OFFICIAL', icon: <Smile size={12} /> }
+                                        ].map((tab) => (
+                                            <button
+                                                key={tab.id}
+                                                onClick={() => setActiveAssetTab(tab.id as any)}
+                                                className={`flex-1 py-4 flex items-center justify-center gap-2 text-[10px] font-mono tracking-widest transition-all ${activeAssetTab === tab.id ? 'text-gold-primary bg-gold-primary/5' : 'text-gray-600 hover:text-gray-400'}`}
+                                            >
+                                                {tab.icon} {tab.label}
+                                            </button>
+                                        ))}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="h-64 overflow-y-auto p-4 custom-scrollbar bg-black/60">
+                                        {activeAssetTab === 'custom' && (
+                                            <div className="grid grid-cols-4 gap-3">
+                                                {CUSTOM_EMOJIS.map((e, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => handleSelectAsset(e.code)}
+                                                        className="aspect-square bg-white/5 rounded-xl flex flex-col items-center justify-center hover:bg-gold-primary/10 hover:border-gold-primary/30 border border-transparent transition-all group"
+                                                    >
+                                                        {e.icon}
+                                                        <span className="text-[7px] text-gray-600 uppercase mt-1 group-hover:text-gold-primary">{e.label}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {activeAssetTab === 'emoji' && (
+                                            <div className="grid grid-cols-6 gap-2">
+                                                {STANDARD_EMOJIS.map((e, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => handleSelectAsset(e)}
+                                                        className="text-2xl hover:bg-white/5 rounded-lg py-2 transition-colors"
+                                                    >
+                                                        {e}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+
+                                        {activeAssetTab === 'giphy' && (
+                                            <div className="space-y-4">
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Search GIFs..."
+                                                        value={giphySearch}
+                                                        onChange={(e) => setGiphySearch(e.target.value)}
+                                                        onKeyDown={(e) => e.key === 'Enter' && searchGiphy(giphySearch)}
+                                                        className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-gold-primary/40"
+                                                    />
+                                                    <button
+                                                        onClick={() => searchGiphy(giphySearch)}
+                                                        className="btn-gold py-1 px-3 text-[10px]"
+                                                    >
+                                                        FIND
+                                                    </button>
+                                                </div>
+                                                {isSearchingGiphy ? (
+                                                    <div className="flex justify-center py-8">
+                                                        <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1 }} className="text-gold-primary"><Zap size={24} /></motion.div>
+                                                    </div>
+                                                ) : (
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        {giphyResults.map((gif) => (
+                                                            <button
+                                                                key={gif.id}
+                                                                onClick={() => handleSelectAsset(gif.images.fixed_height.url, 'image')}
+                                                                className="rounded-lg overflow-hidden hover:opacity-80 transition-opacity aspect-square bg-white/5"
+                                                                title={gif.title}
+                                                            >
+                                                                <img src={gif.images.fixed_height.url} className="w-full h-full object-cover" alt={gif.title} />
+                                                            </button>
+                                                        ))}
+                                                        {giphyResults.length === 0 && (
+                                                            <p className="col-span-2 text-center text-[9px] text-gray-600 uppercase tracking-widest py-8">Connect to GIPHY database...</p>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="bg-black/80 border-t border-white/5 p-3 flex justify-between items-center">
+                                        <p className="text-[8px] font-mono text-gray-700 uppercase tracking-widest">Asset Management v1.0</p>
+                                        <button onClick={() => setShowAssetLibrary(false)} className="text-gray-500 hover:text-white transition-colors">
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </div>
             </div>

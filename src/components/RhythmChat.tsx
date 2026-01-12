@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bot, Sparkles, Lock, AlertTriangle, Search, Terminal } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface Message {
     id: number;
@@ -189,7 +189,7 @@ const KNOWLEDGE_BASE = [
 
 const ALL_COMMANDS = [
     "--- NAVIGATION ---",
-    "/home - Go to homepage", "/about - Visit About page", "/store - Visit Store", "/contact - Visit Contact", "/shop - Open Shop", "/gallery - Visit Gallery", "/newsletter - Signup", "/instruments - View Instruments", "/games - Play Games",
+    "/home - Go to homepage", "/about - Visit About page", "/store - Visit Store", "/contact - Visit Contact", "/chat - Community Chat", "/shop - Open Shop", "/gallery - Visit Gallery", "/newsletter - Signup", "/instruments - View Instruments", "/games - Play Games",
     "--- FOUNDATION ---",
     "/mission - View Mission", "/vision - View Vision", "/goal - View Goals", "/values - Core Values", "/heritage - Our History",
     "/faith - Gospel Focus", "/culture - Traditions", "/founder - Founder Info", "/manager - Manager Info", "/choir - Music Groups",
@@ -252,6 +252,8 @@ const RhythmChat: React.FC = () => {
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const location = useLocation();
+    const isChatPage = location.pathname === '/chat';
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -393,6 +395,7 @@ const RhythmChat: React.FC = () => {
             else if (cmd === '/newsletter' || cmd === '/outreach') { res = "Opening the Newsletter portal."; action = () => navigate('/newsletter'); }
             else if (cmd === '/instruments') { res = "Directing you to our handcrafted instrument collection."; action = () => navigate('/instruments'); }
             else if (cmd === '/games') { res = "Opening the Games Hub."; action = () => navigate('/games'); }
+            else if (cmd === '/chat') { res = "Opening the Community Chat frequency."; action = () => navigate('/chat'); }
 
             // FOUNDATION INFO
             else if (cmd === '/mission') res = "**MISSION**: To bridge rhythm and truth through premium artistry and faith-led community empowerment.";
@@ -435,7 +438,7 @@ const RhythmChat: React.FC = () => {
 
     return (
         <>
-            <div className="fixed bottom-6 right-6 z-50">
+            <div className={`fixed ${isChatPage ? 'bottom-32 md:bottom-28' : 'bottom-6'} right-6 z-50`}>
                 <AnimatePresence>
                     {!isOpen && (
                         <motion.button

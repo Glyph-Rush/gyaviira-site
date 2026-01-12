@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Music, Mic2, Waves, Zap } from 'lucide-react';
 
@@ -256,6 +257,8 @@ const PulseLyrics: React.FC = () => {
     const [output, setOutput] = useState<string[]>([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [status, setStatus] = useState<string | null>(null);
+    const location = useLocation();
+    const isChatPage = location.pathname === '/chat';
 
     const generateLyrics = (themeKey: string) => {
         setIsGenerating(true);
@@ -325,7 +328,7 @@ const PulseLyrics: React.FC = () => {
     };
 
     return (
-        <div className="fixed bottom-24 right-6 z-50">
+        <div className={`fixed ${isChatPage ? 'bottom-52 md:bottom-48' : 'bottom-24'} right-6 z-50`}>
             <AnimatePresence>
                 {!isOpen && (
                     <motion.button
