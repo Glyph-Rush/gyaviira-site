@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ShoppingBag, User, LogOut, Settings, MessageSquare, ChevronDown, Shield, BadgeCheck } from 'lucide-react';
+import { Menu, X, ShoppingBag, User, LogOut, MessageSquare, ChevronDown, BadgeCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../assets/gyaviira_gold.png';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +13,7 @@ const Navbar: React.FC = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
   const { itemCount } = useCart();
+  const [mobileExtensionsOpen, setMobileExtensionsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,8 +33,15 @@ const Navbar: React.FC = () => {
     { name: 'Gallery', path: '/gallery', external: false },
     { name: 'Merch', path: '/store', external: false },
     { name: 'Instruments', path: '/instruments', external: false },
-    { name: 'Tuner', path: '/extensions/GuitarTuner/index.html', external: true },
-    { name: 'Games', path: '/games', external: false },
+    {
+      name: 'Extensions',
+      path: '#',
+      external: false,
+      dropdown: [
+        { name: 'Game Hub', path: '/games', external: false },
+        { name: 'Tuner Suite', path: '/extensions/GuitarTuner/index.html', external: true }
+      ]
+    },
     { name: 'Newsletter', path: '/newsletter', external: false },
     { name: 'Contact', path: '/contact', external: false },
   ];
@@ -49,22 +57,45 @@ const Navbar: React.FC = () => {
         {/* Desktop Menu */}
         <div className="hidden lg:flex items-center gap-4 xl:gap-8">
           {navLinks.map((link) => (
-            link.external ? (
-              <a
-                key={link.name}
-                href={link.path}
-                className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary text-white/70`}
-              >
-                {link.name}
-              </a>
+            link.dropdown ? (
+              <div key={link.name} className="relative group h-full flex items-center">
+                <button className="flex items-center gap-1 text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary text-white/70 group-hover:text-gold-primary">
+                  {link.name} <ChevronDown size={12} className="group-hover:rotate-180 transition-transform duration-300" />
+                </button>
+                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
+                  <div className="glass-card bg-black/95 border border-gold-primary/20 rounded-xl overflow-hidden p-2 flex flex-col gap-1 shadow-2xl">
+                    {link.dropdown.map((sub) => (
+                      sub.external ? (
+                        <a key={sub.name} href={sub.path} className="block px-4 py-3 text-[10px] font-bold uppercase tracking-widest text-white/70 hover:text-gold-primary hover:bg-white/5 rounded-lg transition-all text-center">
+                          {sub.name}
+                        </a>
+                      ) : (
+                        <Link key={sub.name} to={sub.path} className={`block px-4 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 rounded-lg transition-all text-center ${location.pathname === sub.path ? 'text-gold-primary neon-gold' : 'text-white/70 hover:text-gold-primary'}`}>
+                          {sub.name}
+                        </Link>
+                      )
+                    ))}
+                  </div>
+                </div>
+              </div>
             ) : (
-              <Link
-                key={link.name}
-                to={link.path}
-                className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary ${location.pathname === link.path ? 'text-gold-primary neon-gold' : 'text-white/70'}`}
-              >
-                {link.name}
-              </Link>
+              link.external ? (
+                <a
+                  key={link.name}
+                  href={link.path}
+                  className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary text-white/70`}
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  className={`text-[10px] xl:text-xs font-bold uppercase tracking-[0.15em] xl:tracking-[0.2em] transition-all duration-300 hover:text-gold-primary ${location.pathname === link.path ? 'text-gold-primary neon-gold' : 'text-white/70'}`}
+                >
+                  {link.name}
+                </Link>
+              )
             )
           ))}
           <div className="h-4 w-px bg-white/10 mx-2 hidden xl:block"></div>
@@ -114,14 +145,6 @@ const Navbar: React.FC = () => {
                       </div>
 
                       <div className="space-y-1">
-                        {user.role === 'admin' && (
-                          <Link to="/admin" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gold-primary/10 text-gold-primary border border-gold-primary/20 hover:bg-gold-primary hover:text-black transition-all">
-                            <Shield size={16} /> <span className="text-[10px] font-bold uppercase tracking-widest">Overseer Panel</span>
-                          </Link>
-                        )}
-                        <Link to="/account" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gold-primary/10 text-white/70 hover:text-gold-primary transition-all">
-                          <Settings size={16} /> <span className="text-[10px] font-bold uppercase tracking-widest">Account Settings</span>
-                        </Link>
                         <Link to="/chat" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gold-primary/10 text-white/70 hover:text-gold-primary transition-all">
                           <MessageSquare size={16} /> <span className="text-[10px] font-bold uppercase tracking-widest">Community Chat</span>
                         </Link>
@@ -164,22 +187,55 @@ const Navbar: React.FC = () => {
           >
             <div className="flex flex-col items-center py-8 gap-6 px-6">
               {navLinks.map((link) => (
-                link.external ? (
-                  <a
-                    key={link.name}
-                    href={link.path}
-                    className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
-                  >
-                    {link.name}
-                  </a>
+                link.dropdown ? (
+                  <div key={link.name} className="flex flex-col items-center w-full">
+                    <button
+                      onClick={() => setMobileExtensionsOpen(!mobileExtensionsOpen)}
+                      className="text-lg font-heading text-white hover:text-gold-primary tracking-widest flex items-center gap-2"
+                    >
+                      {link.name} <ChevronDown size={16} className={`transition-transform duration-300 ${mobileExtensionsOpen ? 'rotate-180 text-gold-primary' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {mobileExtensionsOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden flex flex-col gap-4 mt-4 w-full bg-white/5 rounded-2xl"
+                        >
+                          {link.dropdown.map(sub => (
+                            sub.external ? (
+                              <a key={sub.name} href={sub.path} className="py-3 text-center text-sm font-mono text-gray-400 uppercase tracking-widest hover:text-white">
+                                {sub.name}
+                              </a>
+                            ) : (
+                              <Link key={sub.name} to={sub.path} onClick={() => setIsOpen(false)} className="py-3 text-center text-sm font-mono text-gray-400 uppercase tracking-widest hover:text-white">
+                                {sub.name}
+                              </Link>
+                            )
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 ) : (
-                  <Link
-                    key={link.name}
-                    to={link.path}
-                    className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
-                  >
-                    {link.name}
-                  </Link>
+                  link.external ? (
+                    <a
+                      key={link.name}
+                      href={link.path}
+                      className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
+                    >
+                      {link.name}
+                    </a>
+                  ) : (
+                    <Link
+                      key={link.name}
+                      to={link.path}
+                      className="text-lg font-heading text-white hover:text-gold-primary tracking-widest"
+                    >
+                      {link.name}
+                    </Link>
+                  )
                 )
               ))}
 
@@ -200,14 +256,7 @@ const Navbar: React.FC = () => {
                       <p className="text-[10px] font-mono text-gold-primary uppercase tracking-widest">{user.role === 'admin' ? 'Overseer' : 'Active Signal'}</p>
                     </div>
                   </div>
-                  {user.role === 'admin' && (
-                    <Link to="/admin" className="flex items-center justify-center gap-3 w-full py-4 bg-gold-primary/10 text-gold-primary border border-gold-primary/30 rounded-2xl uppercase text-xs font-bold tracking-widest">
-                      <Shield size={16} /> Overseer Panel
-                    </Link>
-                  )}
-                  <Link to="/account" className="flex items-center justify-center gap-3 w-full py-4 text-white hover:text-gold-primary border border-white/5 rounded-2xl uppercase text-xs font-bold tracking-widest">
-                    <Settings size={16} /> Account Hub
-                  </Link>
+
                   <Link to="/chat" className="flex items-center justify-center gap-3 w-full py-4 text-white hover:text-gold-primary border border-white/5 rounded-2xl uppercase text-xs font-bold tracking-widest">
                     <MessageSquare size={16} /> Community Chat
                   </Link>
@@ -224,7 +273,7 @@ const Navbar: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </nav >
   );
 };
 

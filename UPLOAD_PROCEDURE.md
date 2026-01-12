@@ -23,6 +23,7 @@ These are the files that make up your application. These **MUST** be on GitHub.
 - **`src/`** (All your React code, components, pages)
 - **`public/`** (Static assets like images, icons, and **Extensions**)
   - *Ensure `public/extensions/` (Guitar Tuner) is included!*
+  - *Ensure `public/assets/` (Tuner Backgrounds) is included!*
 - **`package.json`** & **`package-lock.json`** (Tells others which dependencies to install)
 - **`vite.config.ts`** (Build configuration)
 - **`tsconfig.json`** (TypeScript configuration)

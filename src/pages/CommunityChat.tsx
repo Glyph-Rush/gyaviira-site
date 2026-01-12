@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import { Send, Hash, Users, Crown, Zap, Music, Search, MoreVertical, Plus, Smile, User, BadgeCheck, X, Download, Trash2 } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
 import { supabase } from '../lib/supabase';
 
 interface ChatMessage {
     id: string;
-    user_id: string;
+    user_id: string | null;
     username: string;
     text: string;
     created_at: string;
@@ -18,7 +17,6 @@ interface ChatMessage {
 
 const CommunityChat: React.FC = () => {
     const { user, allUsers, loading } = useAuth();
-    const navigate = useNavigate();
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
     const [activeChannel, setActiveChannel] = useState('general-vibe');
@@ -26,10 +24,32 @@ const CommunityChat: React.FC = () => {
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Redirect to auth if not logged in
+    const [displayName, setDisplayName] = useState('');
+    const [showNameModal, setShowNameModal] = useState(false);
+
+    // Initialize Guest Session
     useEffect(() => {
-        if (!loading && !user) navigate('/auth');
-    }, [user, loading, navigate]);
+        // If user is logged in, use their username
+        if (user) {
+            setDisplayName(user.username);
+            return;
+        }
+
+        // Otherwise check session storage for guest name
+        const storedName = sessionStorage.getItem('guest_name');
+        if (storedName) {
+            setDisplayName(storedName);
+        } else {
+            setShowNameModal(true);
+        }
+    }, [user, loading]);
+
+    const handleSetGuestName = (name: string) => {
+        if (!name.trim()) return;
+        sessionStorage.setItem('guest_name', name.trim());
+        setDisplayName(name.trim());
+        setShowNameModal(false);
+    };
 
     // Load messages and subscribe to realtime updates
     useEffect(() => {
@@ -79,7 +99,7 @@ const CommunityChat: React.FC = () => {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [activeChannel, user]);
+    }, [activeChannel]);
 
     // Auto-scroll on new messages
     useEffect(() => {
@@ -91,7 +111,14 @@ const CommunityChat: React.FC = () => {
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         const text = inputText.trim();
-        if (!text || !user) return;
+        if (!text || !displayName) return;
+
+        // Check if banned (only applies to logged in users)
+        if (user?.isBanned) {
+            alert('Your connection has been terminated by the Overseer. Transmission blocked.');
+            setInputText('');
+            return;
+        }
 
         // Command detection
         if (text === '/flyer') {
@@ -105,11 +132,11 @@ const CommunityChat: React.FC = () => {
             .from('messages')
             .insert({
                 channel: activeChannel,
-                user_id: user.id,
-                username: user.username,
+                user_id: user?.id || null, // Allow null for guests
+                username: displayName, // Use active display name
                 text: text,
-                profile_pic: user.profilePic,
-                is_admin: user.role === 'admin'
+                profile_pic: user?.profilePic || null,
+                is_admin: user?.role === 'admin'
             });
 
         if (!error) {
@@ -124,7 +151,6 @@ const CommunityChat: React.FC = () => {
             .eq('id', messageId);
     };
 
-    if (!user) return null;
 
     return (
         <div className="pt-24 pb-0 h-screen bg-[#020202] flex flex-col">
@@ -174,16 +200,23 @@ const CommunityChat: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Guest/User Status Footer */}
                     <div className="mt-auto pt-6 border-t border-white/5">
                         <div className="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
                             <div className="w-10 h-10 rounded-xl bg-gold-dark/20 border border-gold-primary/30 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                {user.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" alt={user.username} /> : <User size={20} className="text-gold-primary/40" />}
+                                {user?.profilePic ? <img src={user.profilePic} className="w-full h-full object-cover" alt={displayName} /> : <User size={20} className="text-gold-primary/40" />}
                             </div>
                             <div className="flex-1 overflow-hidden">
-                                <p className="text-[10px] font-bold text-white uppercase tracking-widest truncate">{user.username}</p>
-                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">{user.role === 'admin' ? 'Admin Level' : 'Member Level'}</p>
+                                <p className="text-[10px] font-bold text-white uppercase tracking-widest truncate">{displayName}</p>
+                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">{user?.role === 'admin' ? 'Admin Level' : user ? 'Member Level' : 'Guest Signal'}</p>
                             </div>
-                            <MoreVertical size={14} className="text-gray-600 hover:text-white cursor-pointer" />
+                            {user ? (
+                                <MoreVertical size={14} className="text-gray-600 hover:text-white cursor-pointer" />
+                            ) : (
+                                <button onClick={() => { sessionStorage.removeItem('guest_name'); window.location.reload(); }} className="text-red-500 hover:text-red-400 cursor-pointer" title="Disconnect Signal">
+                                    <X size={14} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -247,7 +280,7 @@ const CommunityChat: React.FC = () => {
                                                 <span className="text-[9px] font-mono text-gray-600 uppercase">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
 
                                                 {/* Delete button for own messages */}
-                                                {msg.user_id === user.id && (
+                                                {(user && msg.user_id === user.id) || (!user && msg.username === displayName) ? (
                                                     <button
                                                         onClick={() => handleDeleteMessage(msg.id)}
                                                         className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400"
@@ -255,7 +288,7 @@ const CommunityChat: React.FC = () => {
                                                     >
                                                         <Trash2 size={14} />
                                                     </button>
-                                                )}
+                                                ) : null}
                                             </div>
                                             <p className="text-gray-300 text-sm leading-relaxed font-light break-words">{msg.text}</p>
                                         </div>
@@ -346,6 +379,47 @@ const CommunityChat: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Display Name Modal */}
+            <AnimatePresence>
+                {showNameModal && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 p-6 backdrop-blur-xl"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            className="max-w-md w-full glass-card border border-gold-primary/30 rounded-[2rem] p-8 text-center"
+                        >
+                            <div className="w-20 h-20 bg-gold-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-gold-primary/20">
+                                <Users size={32} className="text-gold-primary" />
+                            </div>
+                            <h2 className="text-2xl font-impact text-white tracking-widest uppercase mb-2">Identify Yourself</h2>
+                            <p className="text-gray-400 font-mono text-xs mb-8">Enter a callsign to join the frequency.</p>
+
+                            <form onSubmit={(e) => { e.preventDefault(); const fd = new FormData(e.currentTarget); handleSetGuestName(fd.get('nickname') as string); }}>
+                                <input
+                                    name="nickname"
+                                    type="text"
+                                    placeholder="Enter Nickname..."
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white text-center font-bold tracking-wider mb-4 focus:border-gold-primary focus:outline-none"
+                                    autoFocus
+                                    maxLength={15}
+                                />
+                                <button type="submit" className="w-full btn-gold py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
+                                    Join Signal
+                                </button>
+                                <p className="mt-4 text-[9px] text-gray-600 font-mono">
+                                    Nickname deletes upon exit.
+                                </p>
+                            </form>
                         </motion.div>
                     </motion.div>
                 )}

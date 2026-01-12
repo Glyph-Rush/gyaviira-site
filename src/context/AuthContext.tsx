@@ -11,11 +11,7 @@ interface User {
     role: 'user' | 'admin';
     isBanned?: boolean;
     isVerified?: boolean;
-    preferences: {
-        musicAlerts: boolean;
-        communityMentions: boolean;
-        storeExclusives: boolean;
-    };
+
 }
 
 interface AuthContextType {
@@ -26,11 +22,6 @@ interface AuthContextType {
     logout: () => Promise<void>;
     updateProfilePic: (url: string) => Promise<void>;
     updateUsername: (name: string) => Promise<boolean>;
-    banUser: (id: string) => Promise<void>;
-    deleteUser: (id: string) => Promise<void>;
-    updateUserRole: (id: string, role: 'user' | 'admin') => Promise<void>;
-    verifyUser: (id: string) => Promise<void>;
-    updatePreferences: (prefs: Partial<User['preferences']>) => Promise<void>;
     loading: boolean;
 }
 
@@ -86,7 +77,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 role: data.role,
                 isBanned: data.is_banned,
                 isVerified: data.is_verified,
-                preferences: data.preferences
             });
         }
     };
@@ -108,7 +98,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 role: profile.role,
                 isBanned: profile.is_banned,
                 isVerified: profile.is_verified,
-                preferences: profile.preferences
             })));
         }
     };
@@ -194,6 +183,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             if (data.user) {
+                // Explicitly create profile to ensure it exists
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert({
+                        id: data.user.id,
+                        email: email,
+                        username: username,
+                        role: 'user',
+                        is_banned: false,
+                        is_verified: false,
+
+                    });
+
+                if (profileError) {
+                    // If insert fails (likely due to trigger already doing it or constraint), logic might need adjustment but usually safe to ignore duplicate key if trigger exists
+                    // However, for safety we log it.
+                    console.log('Profile creation status:', profileError.message);
+                }
+
                 return { success: true };
             }
 
@@ -250,64 +258,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
     };
 
-    const banUser = async (id: string) => {
-        await supabase
-            .from('profiles')
-            .update({ is_banned: true })
-            .eq('id', id);
-        await loadAllUsers();
-    };
-
-    const deleteUser = async (id: string) => {
-        // Use the RPC function to delete from both auth.users and profiles
-        const { error } = await supabase.rpc('delete_user', { target_user_id: id });
-
-        if (error) {
-            console.error('Failed to delete user:', error.message);
-            // Fallback for missing RPC or error: try to sign out if it was the current user
-            if (id === user?.id) {
-                await logout();
-            }
-        } else {
-            if (id === user?.id) {
-                await logout();
-            }
-            await loadAllUsers();
-        }
-    };
-
-    const updateUserRole = async (id: string, role: 'user' | 'admin') => {
-        await supabase
-            .from('profiles')
-            .update({ role })
-            .eq('id', id);
-        await loadAllUsers();
-    };
-
-    const verifyUser = async (id: string) => {
-        const { error } = await supabase.rpc('verify_user', { target_user_id: id });
-
-        if (error) {
-            console.error('Failed to verify user:', error.message);
-        } else {
-            await loadAllUsers();
-        }
-    };
-
-    const updatePreferences = async (prefs: Partial<User['preferences']>) => {
-        if (!user) return;
-
-        const newPreferences = { ...user.preferences, ...prefs };
-
-        const { error } = await supabase
-            .from('profiles')
-            .update({ preferences: newPreferences })
-            .eq('id', user.id);
-
-        if (!error) {
-            setUser({ ...user, preferences: newPreferences });
-        }
-    };
 
     return (
         <AuthContext.Provider value={{
@@ -318,11 +268,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             logout,
             updateProfilePic,
             updateUsername,
-            banUser,
-            deleteUser,
-            updateUserRole,
-            verifyUser,
-            updatePreferences,
             loading
         }}>
             {children}

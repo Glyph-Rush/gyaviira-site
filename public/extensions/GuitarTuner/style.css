@@ -2,7 +2,7 @@
 
 body {
     background-color: #000;
-    background-image: url('../../../src/assets/store_desktop.png');
+    background-image: url('/assets/store_desktop.png');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -18,7 +18,7 @@ body {
 
 @media (max-width: 768px) {
     body {
-        background-image: url('../../../src/assets/store_mobile.png');
+        background-image: url('/assets/store_mobile.png');
     }
 }
 

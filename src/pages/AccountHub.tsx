@@ -74,12 +74,30 @@ const AccountHub: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="flex items-center justify-center gap-2 mb-1">
-                                <h2 className="text-2xl font-impact text-white tracking-widest uppercase truncate max-w-[200px]">{user.username}</h2>
-                                {(user.isVerified || user.role === 'admin') && <BadgeCheck size={20} className="text-gold-primary fill-gold-primary/20" />}
-                                {user.role === 'admin' && <span className="bg-gold-primary text-black text-[8px] px-2 py-0.5 rounded-md font-bold tracking-tighter">ADMIN</span>}
+                            <div className="flex flex-col items-center justify-center gap-2 mb-1">
+                                <div className="flex items-center gap-2">
+                                    <h2 className="text-2xl font-impact text-white tracking-widest uppercase truncate max-w-[200px]">{user.username}</h2>
+                                    {(user.isVerified || user.role === 'admin') && <BadgeCheck size={20} className="text-gold-primary fill-gold-primary/20" />}
+                                    {user.role === 'admin' && <span className="bg-gold-primary text-black text-[8px] px-2 py-0.5 rounded-md font-bold tracking-tighter">ADMIN</span>}
+                                </div>
+                                {!user.isVerified && user.role !== 'admin' && (
+                                    user.preferences?.verificationRequested ? (
+                                        <span className="text-[10px] font-mono text-yellow-500 uppercase tracking-widest bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/20">Verification Pending</span>
+                                    ) : (
+                                        <button
+                                            onClick={() => {
+                                                if (window.confirm('Request official verification from the Overseer?')) {
+                                                    updatePreferences({ verificationRequested: true });
+                                                }
+                                            }}
+                                            className="text-[10px] font-mono text-gray-500 hover:text-gold-primary uppercase tracking-widest border-b border-transparent hover:border-gold-primary transition-all pb-0.5"
+                                        >
+                                            Request Verification
+                                        </button>
+                                    )
+                                )}
                             </div>
-                            <p className="text-gold-primary/60 font-mono text-[10px] uppercase tracking-[0.3em] mb-6">{user.role === 'admin' ? 'Overseer' : 'Foundation Member'}</p>
+                            <p className="text-gold-primary/60 font-mono text-[10px] uppercase tracking-[0.3em] mb-6 mt-2">{user.role === 'admin' ? 'Overseer' : 'Foundation Member'}</p>
 
                             <div className="flex flex-col gap-3">
                                 <button
