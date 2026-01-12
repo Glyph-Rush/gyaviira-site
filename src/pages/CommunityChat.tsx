@@ -30,6 +30,65 @@ const CommunityChat: React.FC = () => {
     const [giphyResults, setGiphyResults] = useState<any[]>([]);
     const [isSearchingGiphy, setIsSearchingGiphy] = useState(false);
 
+    const CUSTOM_EMOJIS = [
+        { icon: <Crown size={20} className="text-gold-primary" />, label: 'Overseer', code: '👑' },
+        { icon: <Music size={20} className="text-gold-primary" />, label: 'Rhythm', code: '🎵' },
+        { icon: <Zap size={20} className="text-gold-primary" />, label: 'Pulse', code: '⚡' },
+        { icon: <Hash size={20} className="text-gold-primary" />, label: 'Signal', code: '#' },
+        { icon: <Flame size={20} className="text-gold-primary" />, label: 'Vibe', code: '🔥' },
+        { icon: <Star size={20} className="text-gold-primary" />, label: 'Verified', code: '⭐' },
+        { icon: <Heart size={20} className="text-gold-primary" />, label: 'Love', code: '💎' },
+        { icon: <Music2 size={20} className="text-gold-primary" />, label: 'Acoustic', code: '🎸' },
+    ];
+
+    const STANDARD_EMOJIS = ['😊', '😂', '🔥', '🙌', '💯', '🦾', '💎', '🎵', '✨', '⚡', '🚀', '🖤', '👑', '🤝', '🔊', '🎧', '🎸', '🎹', '🌍', '👽'];
+
+    const GUEST_AVATARS = [
+        'Crown', 'Music', 'Zap', 'Star', 'Heart', 'Flame', 'Music2', 'Mic2', 'Disc', 'Radio', 'Speaker', 'Headphones', 'Gem', 'Trophy', 'Activity', 'Volume2'
+    ];
+
+    const getAvatarForName = (name: string) => {
+        if (!name) return 'User';
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const index = Math.abs(hash) % GUEST_AVATARS.length;
+        return `icon:${GUEST_AVATARS[index]}`;
+    };
+
+    const renderAvatar = (pic: string | null, isAdmin: boolean, username: string) => {
+        if (pic && pic.startsWith('http')) {
+            return <img src={pic} className="w-full h-full object-cover" alt={username} />;
+        }
+
+        if (isAdmin) return <Music size={20} />;
+
+        const iconName = pic?.startsWith('icon:') ? pic.replace('icon:', '') : 'User';
+
+        const iconProps = { size: 20, className: "text-gold-primary drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]" };
+
+        switch (iconName) {
+            case 'Crown': return <Crown {...iconProps} />;
+            case 'Music': return <Music {...iconProps} />;
+            case 'Zap': return <Zap {...iconProps} />;
+            case 'Star': return <Star {...iconProps} />;
+            case 'Heart': return <Heart {...iconProps} />;
+            case 'Flame': return <Flame {...iconProps} />;
+            case 'Music2': return <Music2 {...iconProps} />;
+            case 'Mic2': return <Mic2 {...iconProps} />;
+            case 'Disc': return <Disc {...iconProps} />;
+            case 'Radio': return <Radio {...iconProps} />;
+            case 'Speaker': return <Speaker {...iconProps} />;
+            case 'Headphones': return <Headphones {...iconProps} />;
+            case 'Gem': return <Gem {...iconProps} />;
+            case 'Trophy': return <Trophy {...iconProps} />;
+            case 'Activity': return <Activity {...iconProps} />;
+            case 'Volume2': return <Volume2 {...iconProps} />;
+            default: return <User size={20} className="text-gray-700" />;
+        }
+    };
+
     // Initialize Guest Session
     useEffect(() => {
         // Check session storage for guest name
@@ -175,8 +234,7 @@ const CommunityChat: React.FC = () => {
         if (!query.trim()) return;
         setIsSearchingGiphy(true);
         try {
-            // Using a public-intent key (Note: In production this should be an env var)
-            const API_KEY = 'dc6zaTOxFJmzC'; // Public Beta Key
+            const API_KEY = import.meta.env.VITE_GIPHY_API_KEY || 'dc6zaTOxFJmzC';
             const response = await fetch(`https://api.giphy.com/v1/gifs/search?api_key=${API_KEY}&q=${query}&limit=12&rating=g`);
             const { data } = await response.json();
             setGiphyResults(data || []);
@@ -186,64 +244,6 @@ const CommunityChat: React.FC = () => {
         setIsSearchingGiphy(false);
     };
 
-    const CUSTOM_EMOJIS = [
-        { icon: <Crown size={20} className="text-gold-primary" />, label: 'Overseer', code: '👑' },
-        { icon: <Music size={20} className="text-gold-primary" />, label: 'Rhythm', code: '🎵' },
-        { icon: <Zap size={20} className="text-gold-primary" />, label: 'Pulse', code: '⚡' },
-        { icon: <Hash size={20} className="text-gold-primary" />, label: 'Signal', code: '#' },
-        { icon: <Flame size={20} className="text-gold-primary" />, label: 'Vibe', code: '🔥' },
-        { icon: <Star size={20} className="text-gold-primary" />, label: 'Verified', code: '⭐' },
-        { icon: <Heart size={20} className="text-gold-primary" />, label: 'Love', code: '💎' },
-        { icon: <Music2 size={20} className="text-gold-primary" />, label: 'Acoustic', code: '🎸' },
-    ];
-
-    const STANDARD_EMOJIS = ['😊', '😂', '🔥', '🙌', '💯', '🦾', '💎', '🎵', '✨', '⚡', '🚀', '🖤', '👑', '🤝', '🔊', '🎧', '🎸', '🎹', '🌍', '👽'];
-
-    const GUEST_AVATARS = [
-        'Crown', 'Music', 'Zap', 'Star', 'Heart', 'Flame', 'Music2', 'Mic2', 'Disc', 'Radio', 'Speaker', 'Headphones', 'Gem', 'Trophy', 'Activity', 'Volume2'
-    ];
-
-    const getAvatarForName = (name: string) => {
-        if (!name) return 'User';
-        let hash = 0;
-        for (let i = 0; i < name.length; i++) {
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        const index = Math.abs(hash) % GUEST_AVATARS.length;
-        return `icon:${GUEST_AVATARS[index]}`;
-    };
-
-    const renderAvatar = (pic: string | null, isAdmin: boolean, username: string) => {
-        if (pic && pic.startsWith('http')) {
-            return <img src={pic} className="w-full h-full object-cover" alt={username} />;
-        }
-
-        if (isAdmin) return <Music size={20} />;
-
-        const iconName = pic?.startsWith('icon:') ? pic.replace('icon:', '') : 'User';
-
-        const iconProps = { size: 20, className: "text-gold-primary drop-shadow-[0_0_8px_rgba(212,175,55,0.4)]" };
-
-        switch (iconName) {
-            case 'Crown': return <Crown {...iconProps} />;
-            case 'Music': return <Music {...iconProps} />;
-            case 'Zap': return <Zap {...iconProps} />;
-            case 'Star': return <Star {...iconProps} />;
-            case 'Heart': return <Heart {...iconProps} />;
-            case 'Flame': return <Flame {...iconProps} />;
-            case 'Music2': return <Music2 {...iconProps} />;
-            case 'Mic2': return <Mic2 {...iconProps} />;
-            case 'Disc': return <Disc {...iconProps} />;
-            case 'Radio': return <Radio {...iconProps} />;
-            case 'Speaker': return <Speaker {...iconProps} />;
-            case 'Headphones': return <Headphones {...iconProps} />;
-            case 'Gem': return <Gem {...iconProps} />;
-            case 'Trophy': return <Trophy {...iconProps} />;
-            case 'Activity': return <Activity {...iconProps} />;
-            case 'Volume2': return <Volume2 {...iconProps} />;
-            default: return <User size={20} className="text-gray-700" />;
-        }
-    };
 
 
     return (
@@ -344,7 +344,7 @@ const CommunityChat: React.FC = () => {
                                         className="flex gap-3 md:gap-4 group"
                                     >
                                         <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${msg.is_admin ? 'bg-gold-primary text-black border-gold-primary shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'bg-black-soft border-white/10 group-hover:border-gold-primary/30'} overflow-hidden`}>
-                                            {renderAvatar(msg.profile_pic, !!msg.is_admin, msg.username)}
+                                            {renderAvatar(msg.profile_pic ?? null, !!msg.is_admin, msg.username)}
                                         </div>
                                         <div className="space-y-1 flex-1 min-w-0">
                                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">

@@ -1,19 +1,24 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import communityConcert from '../assets/community_concert_1767467391861.png';
+import artistryInMotion from '../assets/artistry_in_motion_1767467362729.png';
+import abstractHarmony from '../assets/abstract_harmony_1767467412157.png';
+import liveEnergy from '../assets/live_energy_1767467426931.png';
+import gildedVibrations from '../assets/gilded_vibrations_1767467443552.png';
 
 const images = [
     { url: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=2070', title: 'Musical Heritage' },
     { url: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?q=80&w=2070', title: 'Traditional Rhythms' },
-    { url: '/brain/4b5dc652-d3bf-4826-9300-41702f6ae61e/community_concert_1767467391861.png', title: 'Community Concert' },
+    { url: communityConcert, title: 'Community Concert' },
     { url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070', title: 'Youth Mentorship' },
-    { url: '/brain/4b5dc652-d3bf-4826-9300-41702f6ae61e/artistry_in_motion_1767467362729.png', title: 'Artistry in Motion' },
+    { url: artistryInMotion, title: 'Artistry in Motion' },
     { url: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=2070', title: 'Faith-Rooted Performance' },
-    { url: '/brain/4b5dc652-d3bf-4826-9300-41702f6ae61e/abstract_harmony_1767467412157.png', title: 'Abstract Harmony' },
+    { url: abstractHarmony, title: 'Abstract Harmony' },
     { url: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=2069', title: 'Sonic Textures' },
-    { url: '/brain/4b5dc652-d3bf-4826-9300-41702f6ae61e/live_energy_1767467426931.png', title: 'Live Energy' },
+    { url: liveEnergy, title: 'Live Energy' },
     { url: 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=2070', title: 'Collective Pulse' },
     { url: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=2070', title: 'Rhythmic Shadows' },
-    { url: '/brain/4b5dc652-d3bf-4826-9300-41702f6ae61e/gilded_vibrations_1767467443552.png', title: 'Gilded Vibrations' },
+    { url: gildedVibrations, title: 'Gilded Vibrations' },
 ];
 
 const Gallery: React.FC = () => {

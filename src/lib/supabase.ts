@@ -35,7 +35,7 @@ export interface Database {
                 Row: {
                     id: string;
                     channel: string;
-                    user_id: string;
+                    user_id: string | null;
                     username: string;
                     text: string;
                     profile_pic: string | null;
