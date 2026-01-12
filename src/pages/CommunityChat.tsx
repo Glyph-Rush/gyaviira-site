@@ -620,7 +620,7 @@ const CommunityChat: React.FC = () => {
                                     placeholder="Enter Nickname..."
                                     className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-4 text-white text-center font-bold tracking-wider mb-4 focus:border-gold-primary focus:outline-none"
                                     autoFocus
-                                    maxLength={15}
+                                    maxLength={50}
                                 />
                                 <button type="submit" className="w-full btn-gold py-4 rounded-xl font-bold uppercase tracking-widest text-xs">
                                     Join Signal
