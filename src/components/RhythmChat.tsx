@@ -149,7 +149,25 @@ const KNOWLEDGE_BASE = [
     { keys: ['eternity', 'forever', 'always'], response: "The rhythm of truth is eternal. It was there at the beginning and will be there at the end." },
     { keys: ['the end', 'stop', 'shutdown'], response: "My session will remain active until you close my portal. I'm always here to guide you." },
 
-    // --- 11. PERSONAL CUSTOMER ENGAGEMENT (30+ scenarios) ---
+    // --- 11. PULSE AI & COMMUNITY INTELLIGENCE ---
+    { keys: ['summarize activity', 'community summary', 'whats happening'], response: "Searching recent transmissions... The community is currently focused on the **Zephyros heritage** and upcoming **Kora workshops**. Engagement levels are at 94% with a strong pulse in the #general-vibe frequency." },
+    { keys: ['trending discussions', 'top topics', 'trends'], response: "Top 3 Trending Transmissions:\n1. **Acoustic Innovation**: Deep dive into 432Hz tuning.\n2. **Lore Expansion**: Theories on the heartbeat of Zephyros.\n3. **Mentorship Intake**: High interest in the new cycle." },
+    { keys: ['summarize weekly fan feedback', 'fan feedback', 'feedback summary'], response: "Analyzing weekly signals... Fans are resonating deeply with the **acoustic authenticity** of the new instruments. 85% of feedback suggests a desire for more **behind-the-scenes** creative process content. Sentiment is overwhelmingly positive." },
+    { keys: ['generate lyric ideas from psalm 23', 'lyrics psalm 23', 'psalm 23 lyrics'], response: "Lyric Signal Initialized (Psalm 23 resonance):\n*Verse 1: Green pastures in the digital noise, Still waters in the static void.\nChorus: You lead my rhythm, You host my soul, The Shepard of the sound, making me whole.*" },
+    { keys: ['highlight most active community members', 'active members', 'top fans'], response: "Scanning frequency leaders...\n1. **AlphaRhythm**: High participation in #production-tech.\n2. **ZephyrosSeeker**: Top contributor to #member-lore.\n3. **FaithFlow**: Most consistent signal in #prayer-wall." },
+    { keys: ['suggest new merch designs', 'merch designs', 'design ideas'], response: "Design Signal: Based on trending HSL values and heritage patterns, I suggest:\n1. **Prism Gold Windbreaker**: Transparent material with gold geometric 'Pulse' lines.\n2. **Acoustic Blueprint Tee**: Technical drawing of a Kora on heavy midnight cotton." },
+    { keys: ['engagement report', 'weekly stats', 'performance'], response: "Weekly Engagement Report Initialized:\n*   **Total Signals**: 1,240+\n*   **Active Frequency Hours**: 168\n*   **Sentiment Level**: Harmonious (98%)\n*   **Top Sector**: West African Rhythm Preservation." },
+    { keys: ['suggest topics', 'new interests', 'what to talk about'], response: "Based on member resonance, I suggest exploring:\n*   The intersection of **Faith and Poly-rhythms**.\n*   Documenting local **tribal melodies** for the digital archive.\n*   Collaborative **soundscape design** for Zephyros." },
+    { keys: ['detect inappropriate', 'moderation check', 'is it safe'], response: "Scanning frequency buffers... All transmissions are currently within the **Heritage Safety Parameters**. My autonomous filter is actively dampening discordant signals." },
+
+    // --- 13. WAVE 2 EXTENSIONS & TOOLS ---
+    { keys: ['metronome', 'bpm', 'tempo', 'time signature'], response: "Our **Pulse Metronome** is now active! It features precise BPM control, audible pulses, and visual rhythm indicators. [Open Metronome](/extensions/metronome)", action: '/extensions/metronome' },
+    { keys: ['chord library', 'chords', 'guitar chords', 'piano chords'], response: "The **Gyaviira Chord Library** provides a visual and technical reference for heritage and modern chords across various instruments. [Explore Library](/extensions/chords)", action: '/extensions/chords' },
+    { keys: ['lyric pad', 'write music', 'songwriter'], response: "The **Foundation Lyric Pad** is a focused writing environment that auto-saves your creative transmissions to local storage. [Start Writing](/extensions/lyrics)", action: '/extensions/lyrics' },
+    { keys: ['polls', 'vote', 'community voice'], response: "Your voice directs the foundation! Participate in our active **Community Polls** to vote on merch drops and creative initiatives. [Vote Now](/polls)", action: '/polls' },
+    { keys: ['gamification', 'levels', 'badges', 'points'], response: "The foundation now rewards your resonance! Transmit in the **Sonic Chat** to increase your user level and unlock community prestige. [Go to Chat](/chat)", action: '/chat' },
+
+    // --- 12. PERSONAL CUSTOMER ENGAGEMENT (30+ scenarios) ---
     { keys: ['help me choose', 'recommend', 'suggestion'], response: "I'd love to help! Tell me, are you a melodic soul (strings), a rhythmic heart (drums), or do you prefer the breath of life (wind)?" },
     { keys: ['melodic', 'soulful', 'peaceful'], response: "Then I highly recommend the **Heritage Kora**. Its 21 strings create a bridge between the earth and sky. [View Kora](/instruments)", action: '/instruments' },
     { keys: ['rhythmic', 'powerful', 'steady'], response: "The **Foundation Djembe** is your calling. It carries the heartbeat of the movement. [View Djembe](/instruments)", action: '/instruments' },
@@ -249,6 +267,37 @@ const RhythmChat: React.FC = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [unlockTime, setUnlockTime] = useState<Date | null>(null);
     const [showFlyer, setShowFlyer] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [hasWelcomedAdmin, setHasWelcomedAdmin] = useState(false);
+
+    useEffect(() => {
+        const checkAdmin = () => {
+            const storedName = sessionStorage.getItem('guest_name');
+            const isAdminIdentity =
+                storedName?.toLowerCase() === 'jeromemoses220@gmail.com' ||
+                storedName === 'Jerome Moses';
+
+            if (isAdminIdentity) {
+                setIsAdmin(true);
+                if (!hasWelcomedAdmin) {
+                    setHasWelcomedAdmin(true);
+                    setMessages(prev => [...prev, {
+                        id: Date.now(),
+                        text: "**Greetings, Founder Jerome Moses.** 🛰️ Your frequency has been recognized and authenticated. All core directives are now accessible.\n\nType **/cmd** to see your specialized admin signals.",
+                        sender: 'bot',
+                        timestamp: new Date(),
+                        isSystem: true
+                    }]);
+                }
+            } else {
+                setIsAdmin(false);
+            }
+        };
+
+        checkAdmin();
+        window.addEventListener('focus', checkAdmin);
+        return () => window.removeEventListener('focus', checkAdmin);
+    }, [isOpen, hasWelcomedAdmin]);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -372,9 +421,11 @@ const RhythmChat: React.FC = () => {
 
             // Admin Command Check
             if (ADMIN_COMMANDS.includes(cmd)) {
-                setMessages(prev => [...prev, { id: Date.now(), text: ADMIN_DISCLAIMER, sender: 'bot', timestamp: new Date(), isError: true }]);
-                setIsTyping(false);
-                return;
+                if (!isAdmin) {
+                    setMessages(prev => [...prev, { id: Date.now(), text: ADMIN_DISCLAIMER, sender: 'bot', timestamp: new Date(), isError: true }]);
+                    setIsTyping(false);
+                    return;
+                }
             }
 
             if (cmd === '/clear') {
@@ -471,7 +522,9 @@ const RhythmChat: React.FC = () => {
                                         <h3 className="font-impact text-gold-primary text-xl tracking-tighter uppercase">Rhythm AI</h3>
                                         <div className="flex items-center gap-2">
                                             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                                            <span className="text-[10px] text-gray-500 font-mono">AUTONOMOUS MODE V5.0</span>
+                                            <span className={`text-[10px] font-mono ${isAdmin ? 'text-gold-primary animate-pulse' : 'text-gray-500'}`}>
+                                                {isAdmin ? 'FOUNDER OVERRIDE ACTIVE' : 'AUTONOMOUS MODE V5.0'}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

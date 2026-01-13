@@ -6,24 +6,20 @@ import { useNavigate } from 'react-router-dom';
 
 // Import assets
 import cap1 from '../assets/cap_1.png';
-import cap2 from '../assets/cap_2.png';
-import cap3 from '../assets/cap_3.png';
-import hoodie1 from '../assets/hoodie_1.png';
 import hoodie2 from '../assets/hoodie_2.png';
-import shirt1 from '../assets/shirt_1.png';
 import shirt2 from '../assets/shirt_2.png';
 import downloadMenu from '../assets/download_menu.png';
 
-type Category = 'All' | 'Outerwear' | 'Head' | 'Shirts';
+type Category = 'All' | 'Outerwear' | 'Head' | 'Shirts' | 'Instruments' | 'Digital' | 'Bundles';
 
 const products = [
-    { id: 1, name: 'Gyaviira Gold Cap', price: 5000, image: cap1, category: 'Head' },
-    { id: 2, name: 'F.O.F Gold Cap', price: 5000, image: cap2, category: 'Head' },
-    { id: 3, name: 'Gyaviira Mono Cap', price: 5000, image: cap3, category: 'Head' },
-    { id: 4, name: 'Gyaviira Mono Hoodie', price: 25000, image: hoodie1, category: 'Outerwear' },
-    { id: 5, name: 'Gyaviira Gold Hoodie', price: 25000, image: hoodie2, category: 'Outerwear' },
-    { id: 6, name: 'Gyaviira Mono T-Shirt', price: 15000, image: shirt1, category: 'Shirts' },
-    { id: 7, name: 'Gyaviira Gold T-Shirt', price: 15000, image: shirt2, category: 'Shirts' },
+    { id: 1, name: 'Heritage Kora', price: 450, image: '/src/assets/instruments/kora.png', category: 'Instruments', description: 'Premium 21-string West African harp, handcrafted for the master player.' },
+    { id: 2, name: 'Foundation Djembe', price: 180, image: '/src/assets/instruments/djembe.png', category: 'Instruments', description: 'Hardwood percussion piece with professional-grade skin and resonant pulse.' },
+    { id: 3, name: 'Impact Hoodie', price: 55, image: hoodie2, category: 'Outerwear', description: 'Gold-embroidered heavy cotton, built for the resilient spirit.' },
+    { id: 4, name: 'Signature Gold Cap', price: 25, image: cap1, category: 'Head', description: 'The official headwear of the Gyaviira legacy.' },
+    { id: 5, name: 'Member T-Shirt', price: 30, image: shirt2, category: 'Shirts', description: 'Premium cotton tee featuring the foundation emblem.' },
+    { id: 101, name: 'Genesis Sheet Music', price: 15, image: '/src/assets/digital/sheet_music.png', category: 'Digital', isDigital: true, description: 'Digital score for the Foundation Anthem.' },
+    { id: 102, name: 'Echoes of Zephyros', price: 120, image: '/src/assets/bundles/bundle_1.png', category: 'Bundles', isBundle: true, description: 'Limited Edition Bundle: Vinyl + Hoodie + Signed Poster.', isPreorder: true },
 ];
 
 const Store: React.FC = () => {
@@ -54,7 +50,7 @@ const Store: React.FC = () => {
 
                     {/* Category Filter */}
                     <div className="flex flex-wrap justify-center gap-4">
-                        {['All', 'Outerwear', 'Head', 'Shirts'].map((category) => (
+                        {['All', 'Instruments', 'Outerwear', 'Head', 'Shirts', 'Digital', 'Bundles'].map((category) => (
                             <button
                                 key={category}
                                 onClick={() => setSelectedCategory(category as Category)}
@@ -100,16 +96,30 @@ const Store: React.FC = () => {
                                             onClick={() => addToCart(product)}
                                             className="btn transform scale-90 group-hover:scale-100 transition-transform duration-300 flex items-center gap-2"
                                         >
-                                            <ShoppingBag size={18} /> Add to Cart
+                                            <ShoppingBag size={18} /> {(product as any).isPreorder ? 'RESERVE NOW' : 'Add to Cart'}
                                         </button>
+                                    </div>
+
+                                    {/* Badges */}
+                                    <div className="absolute top-4 left-4 z-30 flex flex-col gap-2">
+                                        {(product as any).isPreorder && (
+                                            <span className="bg-blue-600 text-white text-[8px] font-bold px-3 py-1 rounded-full shadow-lg tracking-widest animate-pulse">PRE-ORDER</span>
+                                        )}
+                                        {(product as any).isDigital && (
+                                            <span className="bg-purple-600 text-white text-[8px] font-bold px-3 py-1 rounded-full shadow-lg tracking-widest">DIGITAL</span>
+                                        )}
+                                        {(product as any).isBundle && (
+                                            <span className="bg-gold-primary text-black text-[8px] font-bold px-3 py-1 rounded-full shadow-lg tracking-widest font-impact">BUNDLE</span>
+                                        )}
                                     </div>
                                 </div>
 
                                 <div className="p-6 bg-[#111] border-t border-gray-900">
                                     <span className="text-xs font-bold text-gold-dark uppercase tracking-wider block mb-2">{product.category}</span>
                                     <h3 className="text-xl font-heading text-white group-hover:text-gold-primary transition-colors">{product.name}</h3>
+                                    <p className="text-gray-500 text-[10px] mt-1 line-clamp-2">{(product as any).description}</p>
                                     <div className="flex justify-between items-center mt-4">
-                                        <p className="text-lg font-bold text-white/90">UGX {product.price.toLocaleString()}</p>
+                                        <p className="text-lg font-bold text-white/90">${product.price.toLocaleString()}</p>
                                         <button
                                             onClick={() => addToCart(product)}
                                             className="w-8 h-8 rounded-full bg-gold-primary/10 flex items-center justify-center text-gold-primary group-hover:bg-gold-primary group-hover:text-black transition-all"
@@ -159,7 +169,7 @@ const Store: React.FC = () => {
                                 <div className="flex items-center gap-3">
                                     <div className="text-right mr-2">
                                         <p className="text-[10px] font-mono uppercase tracking-widest opacity-60">Total Valuation</p>
-                                        <p className="font-impact text-xl uppercase tracking-wider">UGX {totalAmount.toLocaleString()}</p>
+                                        <p className="font-impact text-xl uppercase tracking-wider">${totalAmount.toLocaleString()}</p>
                                     </div>
                                     <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center text-gold-primary group-hover:translate-x-1 transition-transform">
                                         <ArrowRight size={20} />

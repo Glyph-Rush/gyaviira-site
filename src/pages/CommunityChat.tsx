@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Hash, Users, Zap, Music, Search, Plus, Smile, User, X, Download, Trash2, Gift, Star, Heart, Flame, Crown, Music2, Mic2, Disc, Radio, Speaker, Headphones, Gem, Trophy, Activity, Volume2 } from 'lucide-react';
+import { Send, Hash, Users, Zap, Music, Search, Plus, Smile, User, X, Download, Trash2, Gift, Star, Heart, Flame, Crown, Music2, Mic2, Disc, Radio, Speaker, Headphones, Gem, Trophy, Activity, Volume2, Shield, ShieldOff, Pin, Megaphone, AlertCircle } from 'lucide-react';
 import download_menu from '../assets/download_menu.png';
 import { supabase } from '../lib/supabase';
 
@@ -17,7 +17,6 @@ interface ChatMessage {
 const CommunityChat: React.FC = () => {
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [inputText, setInputText] = useState('');
-    const [activeChannel, setActiveChannel] = useState('general-vibe');
     const [showFlyer, setShowFlyer] = useState(false);
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -25,10 +24,20 @@ const CommunityChat: React.FC = () => {
     const [displayName, setDisplayName] = useState('');
     const [showNameModal, setShowNameModal] = useState(false);
     const [showAssetLibrary, setShowAssetLibrary] = useState(false);
-    const [activeAssetTab, setActiveAssetTab] = useState<'emoji' | 'giphy' | 'custom'>('emoji');
+    const [activeAssetTab, setActiveAssetTab] = useState<'custom' | 'giphy' | 'emoji'>('emoji');
     const [giphySearch, setGiphySearch] = useState('');
     const [giphyResults, setGiphyResults] = useState<any[]>([]);
     const [isSearchingGiphy, setIsSearchingGiphy] = useState(false);
+    const [activeChannel, setActiveChannel] = useState('general-vibe');
+
+    // Admin State (Simulated for this session)
+    const [mutedUsers, setMutedUsers] = useState<Set<string>>(new Set());
+    const [bannedUsers, setBannedUsers] = useState<Set<string>>(new Set());
+    const [pinnedMessages, setPinnedMessages] = useState<Set<string>>(new Set());
+    const [messageCooldown, setMessageCooldown] = useState(false);
+    const [userLevel, setUserLevel] = useState(1);
+    const [msgCount, setMsgCount] = useState(0);
+    const [selectedProfile, setSelectedProfile] = useState<any | null>(null);
 
     const CUSTOM_EMOJIS = [
         { icon: <Crown size={20} className="text-gold-primary" />, label: 'Overseer', code: '👑' },
@@ -57,7 +66,7 @@ const CommunityChat: React.FC = () => {
             hash = name.charCodeAt(i) + ((hash << 5) - hash);
         }
         const index = Math.abs(hash) % GUEST_AVATARS.length;
-        return `icon:${GUEST_AVATARS[index]}`;
+        return `icon:${GUEST_AVATARS[index]} `;
     };
 
     const renderAvatar = (pic: string | null, isAdmin: boolean, username: string) => {
@@ -110,6 +119,22 @@ const CommunityChat: React.FC = () => {
         setShowNameModal(false);
     };
 
+    // Initialize Gamification from LocalStorage
+    useEffect(() => {
+        const storedCount = localStorage.getItem('gyaviira_msg_count');
+        if (storedCount) {
+            const count = parseInt(storedCount);
+            setMsgCount(count);
+            setUserLevel(Math.floor(count / 10) + 1);
+        }
+    }, []);
+
+    // Persist Gamification to LocalStorage
+    useEffect(() => {
+        localStorage.setItem('gyaviira_msg_count', msgCount.toString());
+        setUserLevel(Math.floor(msgCount / 10) + 1);
+    }, [msgCount]);
+
     // Load messages and subscribe to realtime updates
     useEffect(() => {
 
@@ -131,14 +156,14 @@ const CommunityChat: React.FC = () => {
 
         // Subscribe to real-time updates
         const channel = supabase
-            .channel(`messages:${activeChannel}`)
+            .channel(`messages:${activeChannel} `)
             .on(
                 'postgres_changes',
                 {
                     event: '*',
                     schema: 'public',
                     table: 'messages',
-                    filter: `channel=eq.${activeChannel}`
+                    filter: `channel = eq.${activeChannel} `
                 },
                 (payload) => {
                     if (payload.eventType === 'INSERT') {
@@ -171,6 +196,32 @@ const CommunityChat: React.FC = () => {
         const text = inputText.trim();
         if (!text || !displayName) return;
 
+        const isFounderIdentity = displayName.toLowerCase() === 'jeromemoses220@gmail.com' || displayName === 'Jerome Moses';
+
+        // 1. Ban Check
+        if (bannedUsers.has(displayName)) {
+            alert("🔒 Access Revoked: You have been banned from this frequency.");
+            return;
+        }
+
+        // 2. Mute Check
+        if (mutedUsers.has(displayName) && !isFounderIdentity) {
+            alert("🔇 Frequency Muted: You are currently restricted from transmitting.");
+            return;
+        }
+
+        // 3. Rate Limit Check
+        if (messageCooldown && !isFounderIdentity) {
+            alert("⚠️ Transmission Overflow: Calm the rhythm. (3s cooldown active)");
+            return;
+        }
+
+        // 4. Announcement Channel Lockdown
+        if (activeChannel === 'announcements' && !isFounderIdentity) {
+            alert("📢 Restricted Frequency: Only Founders can broadcast here.");
+            return;
+        }
+
         // Command detection
         if (text === '/flyer') {
             setShowFlyer(true);
@@ -178,7 +229,11 @@ const CommunityChat: React.FC = () => {
             return;
         }
 
-        const isFounder = displayName.toLowerCase() === 'jeromemoses220@gmail.com';
+        // Start Rate Limit
+        if (!isFounderIdentity) {
+            setMessageCooldown(true);
+            setTimeout(() => setMessageCooldown(false), 3000);
+        }
 
         // Insert message into Supabase
         const { error } = await supabase
@@ -186,10 +241,10 @@ const CommunityChat: React.FC = () => {
             .insert({
                 channel: activeChannel,
                 user_id: null, // Guests only
-                username: isFounder ? "Jerome Moses" : displayName,
+                username: isFounderIdentity ? "Jerome Moses" : displayName,
                 text: text,
                 profile_pic: getAvatarForName(displayName), // Assign unique emoji
-                is_admin: isFounder
+                is_admin: isFounderIdentity
             });
 
         if (error) {
@@ -197,6 +252,7 @@ const CommunityChat: React.FC = () => {
             alert("Transmission Failed: Check your database connection.");
         } else {
             setInputText('');
+            if (!isFounderIdentity) setMsgCount(prev => prev + 1);
         }
     };
 
@@ -205,6 +261,35 @@ const CommunityChat: React.FC = () => {
             .from('messages')
             .delete()
             .eq('id', messageId);
+    };
+
+    const handlePinMessage = (messageId: string) => {
+        setPinnedMessages(prev => {
+            const next = new Set(prev);
+            if (next.has(messageId)) next.delete(messageId);
+            else next.add(messageId);
+            return next;
+        });
+    };
+
+    const handleMuteUser = (username: string) => {
+        if (username === "Jerome Moses") return;
+        setMutedUsers(prev => {
+            const next = new Set(prev);
+            if (next.has(username)) next.delete(username);
+            else next.add(username);
+            return next;
+        });
+    };
+
+    const handleBanUser = (username: string) => {
+        if (username === "Jerome Moses") return;
+        setBannedUsers(prev => {
+            const next = new Set(prev);
+            if (next.has(username)) next.delete(username);
+            else next.add(username);
+            return next;
+        });
     };
 
     const handleSelectAsset = (asset: string, type: 'text' | 'image' = 'text') => {
@@ -269,14 +354,20 @@ const CommunityChat: React.FC = () => {
                             <h3 className="text-[10px] font-mono text-gray-600 uppercase tracking-[0.3em] px-2 flex justify-between items-center">
                                 FREQUENCIES <Plus size={12} className="cursor-pointer hover:text-gold-primary" />
                             </h3>
-                            {['general-vibe', 'production-tech', 'live-transmissions', 'member-lore'].map(chan => (
+                            {['announcements', 'general-vibe', 'production-tech', 'live-transmissions', 'prayer-wall', 'member-lore'].map(chan => (
                                 <button
                                     key={chan}
                                     onClick={() => setActiveChannel(chan)}
-                                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all group ${activeChannel === chan ? 'bg-gold-primary/10 text-gold-primary border border-gold-primary/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
+                                    className={`w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all group ${activeChannel === chan ? 'bg-gold-primary/10 text-gold-primary border border-gold-primary/20' : 'text-gray-500 hover:text-white hover:bg-white/5'}`}
                                 >
-                                    <Hash size={16} className={activeChannel === chan ? 'text-gold-primary' : 'text-gray-700 group-hover:text-gray-400'} />
-                                    <span className="text-xs font-bold tracking-widest uppercase">{chan.replace('-', ' ')}</span>
+                                    <div className="flex items-center gap-3">
+                                        {chan === 'announcements' ? <Megaphone size={16} className={activeChannel === chan ? 'text-gold-primary' : 'text-gray-700'} /> :
+                                            chan === 'prayer-wall' ? <Heart size={16} className={activeChannel === chan ? 'text-gold-primary' : 'text-gray-700'} /> :
+                                                <Hash size={16} className={activeChannel === chan ? 'text-gold-primary' : 'text-gray-700'} />}
+                                        <span className="text-xs font-bold tracking-widest uppercase">{chan.replace('-', ' ')}</span>
+                                    </div>
+                                    {chan === 'announcements' && <Shield size={10} className="text-gold-primary/40" />}
+                                    {chan === 'prayer-wall' && <Star size={10} className="text-gold-primary/40" />}
                                 </button>
                             ))}
                         </div>
@@ -297,7 +388,15 @@ const CommunityChat: React.FC = () => {
                             </div>
                             <div className="flex-1 overflow-hidden">
                                 <p className="text-[10px] font-bold text-white uppercase tracking-widest truncate">{displayName}</p>
-                                <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">Guest Signal</p>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-[8px] font-mono text-gold-primary/60 uppercase tracking-widest">Level {userLevel}</p>
+                                    <div className="w-12 h-1 bg-white/5 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full bg-gold-primary transition-all duration-500"
+                                            style={{ width: `${(msgCount % 10) * 10}%` }}
+                                        ></div>
+                                    </div>
+                                </div>
                             </div>
                             <button onClick={() => { sessionStorage.removeItem('guest_name'); window.location.reload(); }} className="text-red-500 hover:text-red-400 cursor-pointer" title="Disconnect Signal">
                                 <X size={14} />
@@ -348,12 +447,20 @@ const CommunityChat: React.FC = () => {
                                         animate={{ opacity: 1, x: 0 }}
                                         className="flex gap-3 md:gap-4 group"
                                     >
-                                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${msg.is_admin ? 'bg-gold-primary text-black border-gold-primary shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'bg-black-soft border-white/10 group-hover:border-gold-primary/30'} overflow-hidden`}>
+                                        <button
+                                            onClick={() => setSelectedProfile({ username: msg.username, is_admin: msg.is_admin, profile_pic: msg.profile_pic, created_at: msg.created_at })}
+                                            className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex-shrink-0 flex items-center justify-center border transition-all ${msg.is_admin ? 'bg-gold-primary text-black border-gold-primary shadow-[0_0_15px_rgba(212,175,55,0.3)]' : 'bg-black-soft border-white/10 group-hover:border-gold-primary/30'} overflow-hidden focus:outline-none focus:ring-2 focus:ring-gold-primary/50`}
+                                        >
                                             {renderAvatar(msg.profile_pic ?? null, !!msg.is_admin, msg.username)}
-                                        </div>
+                                        </button>
                                         <div className="space-y-1 flex-1 min-w-0">
                                             <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                                                <span className={`text-xs font-impact tracking-widest uppercase ${msg.is_admin ? 'text-gold-primary' : 'text-white'}`}>{msg.username}</span>
+                                                <button
+                                                    onClick={() => setSelectedProfile({ username: msg.username, is_admin: msg.is_admin, profile_pic: msg.profile_pic, created_at: msg.created_at })}
+                                                    className={`text-xs font-impact tracking-widest uppercase hover:text-gold-primary transition-colors ${msg.is_admin ? 'text-gold-primary' : 'text-white'}`}
+                                                >
+                                                    {msg.username}
+                                                </button>
                                                 {msg.is_admin && (
                                                     <div className="flex items-center gap-1.5">
                                                         <span className="bg-gold-primary text-black text-[7px] px-2 py-0.5 rounded-md font-bold tracking-tighter shadow-[0_0_5px_rgba(212,175,55,0.5)]">ADMIN</span>
@@ -362,16 +469,37 @@ const CommunityChat: React.FC = () => {
                                                 )}
                                                 <span className="text-[9px] font-mono text-gray-600 uppercase">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
 
-                                                {/* Delete button for own messages */}
-                                                {(msg.username === displayName || (displayName.toLowerCase() === 'jeromemoses220@gmail.com' && msg.username === 'Jerome Moses')) ? (
-                                                    <button
-                                                        onClick={() => handleDeleteMessage(msg.id)}
-                                                        className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-400"
-                                                        title="Delete message"
-                                                    >
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                ) : null}
+                                                {/* Admin Controls */}
+                                                <div className="ml-auto flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    {(displayName.toLowerCase() === 'jeromemoses220@gmail.com' || displayName === 'Jerome Moses') && (
+                                                        <>
+                                                            <button onClick={() => handlePinMessage(msg.id)} className={`p-1 rounded hover:bg-white/10 ${pinnedMessages.has(msg.id) ? 'text-gold-primary' : 'text-gray-600'}`} title="Pin Message">
+                                                                <Pin size={14} />
+                                                            </button>
+                                                            {msg.username !== 'Jerome Moses' && (
+                                                                <>
+                                                                    <button onClick={() => handleMuteUser(msg.username)} className={`p-1 rounded hover:bg-white/10 ${mutedUsers.has(msg.username) ? 'text-red-500' : 'text-gray-600'}`} title="Mute User">
+                                                                        {mutedUsers.has(msg.username) ? <ShieldOff size={14} /> : <Shield size={14} />}
+                                                                    </button>
+                                                                    <button onClick={() => handleBanUser(msg.username)} className={`p-1 rounded hover:bg-white/10 ${bannedUsers.has(msg.username) ? 'text-red-600 font-bold' : 'text-gray-600'}`} title="Ban User">
+                                                                        <AlertCircle size={14} />
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                        </>
+                                                    )}
+
+                                                    {/* Delete button for own messages or admin */}
+                                                    {(msg.username === displayName || (displayName.toLowerCase() === 'jeromemoses220@gmail.com' && msg.username === 'Jerome Moses') || (displayName.toLowerCase() === 'jeromemoses220@gmail.com')) ? (
+                                                        <button
+                                                            onClick={() => handleDeleteMessage(msg.id)}
+                                                            className="text-red-500 hover:text-red-400"
+                                                            title="Delete message"
+                                                        >
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    ) : null}
+                                                </div>
                                             </div>
                                             {msg.text.startsWith('http') && (msg.text.includes('giphy.com') || msg.text.includes('gif')) ? (
                                                 <div className="mt-2 rounded-xl overflow-hidden max-w-sm border border-white/10 shadow-lg">
@@ -631,6 +759,64 @@ const CommunityChat: React.FC = () => {
                             </form>
                         </motion.div>
                     </motion.div>
+                )}
+            </AnimatePresence>
+            {/* Fan Profile Modal */}
+            <AnimatePresence>
+                {selectedProfile && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedProfile(null)}
+                            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                        />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                            className="relative w-full max-w-sm glass-card border border-gold-primary/20 rounded-[2.5rem] overflow-hidden shadow-2xl p-8 text-center"
+                        >
+                            <button
+                                onClick={() => setSelectedProfile(null)}
+                                className="absolute top-6 right-6 text-gray-500 hover:text-white"
+                            >
+                                <X size={24} />
+                            </button>
+
+                            <div className="w-24 h-24 mx-auto rounded-3xl bg-gold-dark/10 border border-gold-primary/30 flex items-center justify-center mb-6 shadow-gold">
+                                {renderAvatar(selectedProfile.profile_pic, selectedProfile.is_admin, selectedProfile.username)}
+                            </div>
+
+                            <h2 className="text-2xl font-heading text-white mb-1 uppercase tracking-widest">{selectedProfile.username}</h2>
+                            <p className="text-[10px] font-mono text-gold-primary uppercase tracking-[0.3em] mb-6">
+                                {selectedProfile.is_admin ? 'Frequency Overseer' : 'Pulse Explorer'}
+                            </p>
+
+                            <div className="grid grid-cols-2 gap-4 mb-8">
+                                <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <p className="text-[8px] font-mono text-gray-500 uppercase tracking-widest mb-1">Status</p>
+                                    <p className="text-xs font-bold text-white uppercase">Online</p>
+                                </div>
+                                <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <p className="text-[8px] font-mono text-gray-500 uppercase tracking-widest mb-1">Joined</p>
+                                    <p className="text-xs font-bold text-white uppercase">{new Date(selectedProfile.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+
+                            <div className="bg-gold-primary/5 p-4 rounded-2xl border border-gold-primary/10 mb-8">
+                                <p className="text-[9px] font-mono text-gold-primary uppercase tracking-widest mb-2">Member Lore</p>
+                                <p className="text-[10px] text-gray-400 leading-relaxed uppercase italic">
+                                    "Navigating the rhythms of the foundation with faith and sonic precision."
+                                </p>
+                            </div>
+
+                            <button className="w-full py-4 bg-gold-primary text-black rounded-2xl font-heading font-bold uppercase tracking-widest hover:scale-105 transition-all shadow-gold">
+                                Transmission Request
+                            </button>
+                        </motion.div>
+                    </div>
                 )}
             </AnimatePresence>
         </div>

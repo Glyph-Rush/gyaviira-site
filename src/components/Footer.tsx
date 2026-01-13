@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Music, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import { Music, Instagram, Youtube } from 'lucide-react';
 import logo from '../assets/gyaviira_gold.png';
 
 const Footer: React.FC = () => {
@@ -67,18 +67,25 @@ const Footer: React.FC = () => {
                     {/* Legal & Social */}
                     <div className="space-y-4">
                         <h3 className="text-gold-primary font-impact text-sm uppercase tracking-widest">Connect</h3>
-                        <div className="flex gap-3 mb-4">
-                            <a href="https://facebook.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
-                                <Facebook size={18} />
+                        <div className="flex gap-4 mb-4">
+                            <a
+                                href="https://instagram.com/gyav.iira"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Follow Gyaviira on Instagram"
+                                className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all group"
+                            >
+                                <Instagram size={24} />
+                                <span className="ml-2 text-xs font-mono hidden md:inline">@gyav.iira</span>
                             </a>
-                            <a href="https://twitter.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
-                                <Twitter size={18} />
-                            </a>
-                            <a href="https://instagram.com/gyav.iira" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
-                                <Instagram size={18} />
-                            </a>
-                            <a href="https://youtube.com/@GyaviiraMusic" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-lg bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all">
-                                <Youtube size={18} />
+                            <a
+                                href="https://youtube.com/@GyaviiraMusic"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-label="Subscribe to Gyaviira on YouTube"
+                                className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 hover:border-gold-primary/40 flex items-center justify-center text-gray-400 hover:text-gold-primary transition-all group"
+                            >
+                                <Youtube size={24} />
                             </a>
                         </div>
                         <div className="flex flex-col gap-2">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 import { Menu, X, ShoppingBag, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import logo from '../assets/gyaviira_gold.png';
@@ -27,16 +28,20 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { name: 'Home', path: '/', external: false },
     { name: 'About', path: '/about', external: false },
+    { name: 'Store', path: '/store', external: false },
     { name: 'Chat', path: '/chat', external: false },
-    { name: 'Gallery', path: '/gallery', external: false },
-    { name: 'Merch', path: '/store', external: false },
-    { name: 'Instruments', path: '/instruments', external: false },
+    { name: 'Polls', path: '/polls' },
+    { name: 'Calendar', path: '/events', external: false },
+    { name: 'Journal', path: '/blog', external: false },
     {
       name: 'Extensions',
       path: '#',
       external: false,
       dropdown: [
         { name: 'Game Hub', path: '/games', external: false },
+        { name: 'Metronome', path: '/extensions/metronome', external: false },
+        { name: 'Chord Library', path: '/extensions/chords', external: false },
+        { name: 'Lyric Pad', path: '/extensions/lyrics', external: false },
         { name: 'Tuner Suite', path: '/extensions/GuitarTuner/index.html', external: true }
       ]
     },
@@ -98,14 +103,17 @@ const Navbar: React.FC = () => {
           ))}
           <div className="h-4 w-px bg-white/10 mx-2 hidden xl:block"></div>
 
-          <Link to="/store" className="text-white hover:text-gold-primary transition-colors p-2 relative group">
-            <ShoppingBag size={18} />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-gold-primary text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(212,175,55,0.8)] animate-pulse">
-                {itemCount}
-              </span>
-            )}
-          </Link>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <Link to="/store" className="text-white hover:text-gold-primary transition-colors p-2 relative group">
+              <ShoppingBag size={18} />
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-gold-primary text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(212,175,55,0.8)] animate-pulse">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+          </div>
 
         </div>
 
