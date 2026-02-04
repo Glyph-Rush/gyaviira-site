@@ -74,3 +74,7 @@ git commit -m "Remove node_modules from git tracking"
 
 **Q: "How do I deploy if `dist` isn't on GitHub?"**
 **A:** Hosting services like Netlify or Vercel will effectively run `npm install` and `npm run build` on their own servers using your source code. They build the `dist` folder themselves!
+- [ ] `src/pages/AdminPanel.tsx`
+- [ ] `src/pages/extensions/*`
+- [ ] `SQL_UPDATE.md`
+- [ ] `UPLOAD_PROCEDURE.md` (Update self)
